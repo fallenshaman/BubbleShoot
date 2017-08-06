@@ -16,6 +16,14 @@ public class Bubble : MonoBehaviour
         MAX_COUNT,
     }
 
+	public enum TrapType
+	{
+		NONE,
+		FLY,
+		BEETLE,
+		ANT,
+	}
+
     [SerializeField]
     private Rigidbody2D rigidbody;
 

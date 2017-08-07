@@ -18,6 +18,11 @@ public class App : Singleton<App>
         }
     }
 
+    private void Awake()
+    {
+        Screen.SetResolution(1080, 1920, true);
+    }
+
     public Page CurrentPage { get; private set; }
 
     public GameSettings setting;

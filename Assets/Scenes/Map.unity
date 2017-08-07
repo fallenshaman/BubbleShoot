@@ -278,7 +278,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   listPool:
   - poolName: Bubble
-    preLoadCount: 10
+    preLoadCount: 200
     prefab: {fileID: 1849935024705620, guid: 559318654e52e19478521dad5a108232, type: 2}
 --- !u!4 &240676308
 Transform:

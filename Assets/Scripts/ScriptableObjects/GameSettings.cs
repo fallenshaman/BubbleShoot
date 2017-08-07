@@ -14,4 +14,9 @@ public class GameSettings : ScriptableObject
 
     [Header("GameBoard")]
     public float MaxYPosition = 16.5f;
+
+    [Header("Sprites")]
+    public Sprite bee;
+
+    public List<Sprite> missionIcons;
 }

@@ -12,26 +12,257 @@ MonoBehaviour:
   m_Name: Level_1
   m_EditorClassIdentifier: 
   levelType: 0
-  goal: 0
-  bubbleCount: 0
+  goal: 15
+  bubbleCount: 40
   listRows:
   - cells:
     - type: 0
-      color: 0
+      color: 1
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 1
+      color: 1
       trap: 0
     - type: 0
-      color: 1
+      color: 2
       trap: 0
     - type: 1
       color: 2
       trap: 0
     - type: 1
+      color: 2
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 0
+      color: 1
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
       color: 3
       trap: 0
     - type: 1
-      color: 4
+      color: 3
       trap: 0
     - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 1
+      color: 3
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 3
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 3
+      trap: 0
+    - type: 1
+      color: 3
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 1
       color: 0
       trap: 0
     - type: 0
@@ -41,6 +272,71 @@ MonoBehaviour:
       color: 0
       trap: 0
     - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 1
       color: 0
       trap: 0
     - type: 0
@@ -68,20 +364,20 @@ MonoBehaviour:
     - type: 0
       color: 0
       trap: 0
-    - type: 0
-      color: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 2
       trap: 0
     - type: 0
       color: 0
       trap: 0
-    - type: 0
-      color: 0
+    - type: 1
+      color: 1
       trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
+    - type: 1
+      color: 1
       trap: 0
     - type: 0
       color: 0
@@ -97,7 +393,99 @@ MonoBehaviour:
       color: 0
       trap: 0
     - type: 1
+      color: 3
+      trap: 0
+    - type: 3
       color: 0
+      trap: 0
+    - type: 1
+      color: 3
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 3
+      trap: 0
+    - type: 1
+      color: 3
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 1
+      color: 2
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+  - cells:
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 0
+      color: 0
+      trap: 0
+    - type: 1
+      color: 3
+      trap: 0
+    - type: 1
+      color: 3
       trap: 0
     - type: 0
       color: 0
@@ -108,14 +496,33 @@ MonoBehaviour:
     - type: 0
       color: 0
       trap: 0
-    - type: 0
+  - cells:
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 3
       color: 0
       trap: 0
-    - type: 0
+    - type: 1
+      color: 1
+      trap: 0
+    - type: 1
       color: 0
       trap: 0
-    - type: 0
+    - type: 3
       color: 0
+      trap: 0
+    - type: 1
+      color: 0
+      trap: 0
+    - type: 1
+      color: 3
+      trap: 0
+    - type: 3
+      color: 0
+      trap: 0
+    - type: 1
+      color: 3
       trap: 0
     - type: 0
       color: 0
@@ -131,39 +538,14 @@ MonoBehaviour:
       color: 0
       trap: 0
     - type: 1
-      color: 0
+      color: 1
+      trap: 0
+    - type: 1
+      color: 1
       trap: 0
     - type: 0
       color: 0
       trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-  - cells:
     - type: 1
       color: 0
       trap: 0
@@ -173,23 +555,11 @@ MonoBehaviour:
     - type: 0
       color: 0
       trap: 0
-    - type: 0
-      color: 0
+    - type: 1
+      color: 3
       trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
-      trap: 0
-    - type: 0
-      color: 0
+    - type: 1
+      color: 3
       trap: 0
     - type: 0
       color: 0

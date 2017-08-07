@@ -12,6 +12,11 @@ public class GameGrid : MonoBehaviour {
 
     private int gridRowCount;
 
+    public Action OnBubbleAttached = () => { };
+
+    // 버블이 부탁되어 있는 가장 낮은 행의 번호
+    public int LowestBubbleRow { get; private set; }
+
     // 주변 셀 검색시 사용할 Offset 값들
     // 좌, 좌하, 우하, 우, 우상, 좌상 순서임.
     // 인접 셀 검색시에는 전체 (0 ~ 5) 사용
@@ -32,6 +37,9 @@ public class GameGrid : MonoBehaviour {
     {
         // 전체 그리드 높이
         gridRowCount = levelData.listRows.Count + GameConst.GRID_ADDITIONAL_ROW_COUNT;
+
+        // 레벨 데이터가 상의 마지막 행이 가장 마지막 버블이 위치하는 행이다.
+        LowestBubbleRow = levelData.listRows.Count - 1; 
 
         grid = new Cell[gridRowCount, GameConst.GRID_COLUMN_COUNT];
         visitedFlags = new bool[gridRowCount, GameConst.GRID_COLUMN_COUNT];
@@ -63,7 +71,7 @@ public class GameGrid : MonoBehaviour {
                 {
                     CellInfo info = levelData.listRows[row].cells[col];
 
-                    if (info.type != CellInfo.CellType.NORMAL)
+                    if (info.type == CellInfo.CellType.EMPTY)
                         continue;
 
                     GameObject goBubble = bubblePool.Spawn();
@@ -72,8 +80,17 @@ public class GameGrid : MonoBehaviour {
 
                     cell.AttachBubble(bubble);
 
-                    bubble.SetColor(info.color);
-
+                    if (info.type == CellInfo.CellType.NORMAL)
+                    {
+                        bubble.SetColor(info.color);
+                    }
+                    else if(info.type == CellInfo.CellType.BEE)
+                    {
+                        bubble.isBee = true;
+                        bubble.SetColor(Bubble.Color.PURPLE);
+                        bubble.SetSubImage(App.Instance.setting.bee);
+                    }
+                    
                     bubble.transform.parent = this.transform;
                     bubble.transform.localPosition = new Vector3(xOffset + (col * GameConst.GRID_COLUMN_GAP), -posY, 0f);
                 }
@@ -162,6 +179,69 @@ public class GameGrid : MonoBehaviour {
         
         return listAdjacentCell;
     }
+    
+    // 새로운 버블을 기준으로 가장 마지막 버블이 존재하는 행 값을 갱신한다.
+    public void UpdateLowestBubbleRow(Bubble newBubble)
+    {
+        // 새로 버블이 부착된 Cell의 행이 크면 마지막 행값을 갱신
+        LowestBubbleRow = Mathf.Max(LowestBubbleRow, newBubble.cell.row);
+
+        UpdateGridPosition();
+    }
+
+    public void UpdateLowestBubbleRowBottomUp()
+    {
+        for(int row = LowestBubbleRow; row >= 0; --row)
+        {
+            for(int col = 0; col < GameConst.GRID_COLUMN_COUNT; ++col)
+            {
+                Cell cell = grid[row, col];
+
+                if (cell != null && !cell.IsEmpty())
+                {
+                    LowestBubbleRow = row;
+                    UpdateGridPosition();
+                    return;
+                }
+            }
+        }
+    }
+
+    private Coroutine coroutineMovement = null;
+
+    // 화면에 보이는 버블의 위치를 조절한다.
+    public void UpdateGridPosition()
+    {
+        int hideRow = LowestBubbleRow - GameConst.GRID_VISIBILE_ROW_COUNT;
+        if (hideRow < 0)
+            hideRow = 0;
+        
+        Vector3 pos = transform.position;
+        pos.y = GameConst.GRID_MIN_Y_POSITION + (hideRow * GameConst.GRID_ROW_HIDE_HEIGHT);
+
+        if (coroutineMovement != null)
+            StopCoroutine(coroutineMovement);
+
+        coroutineMovement = StartCoroutine(GridMovement(pos));
+    }
+    
+    IEnumerator GridMovement(Vector3 targetPosistion)
+    {
+        float sec = 1f;
+        float elapsedTime = 0f;
+
+        Vector3 startPos = transform.position;
+
+        while(elapsedTime < sec)
+        {
+            transform.position = Vector3.Lerp(startPos, targetPosistion, elapsedTime / sec);
+            
+            elapsedTime += Time.deltaTime;
+
+            yield return null;
+        }
+        transform.position = targetPosistion;
+    }
 
 
     // 버블을 목표 셀 주변의 가장 가까운 빈 셀에 추가한다.
@@ -184,9 +264,7 @@ public class GameGrid : MonoBehaviour {
             Vector3 cellPos = cell.GetPositionOnGrid();
 
             float distance = Vector3.Distance(bubble.transform.localPosition, cellPos);
-
-            Debug.Log(string.Format("[{0},{1}] {2}", cell.row, cell.col, distance));
-
+            
             if (distance < minDistance)
             {
                 minDistance = distance;
@@ -195,6 +273,8 @@ public class GameGrid : MonoBehaviour {
         }
 
         nearestCell.AttachBubble(bubble);
+
+        OnBubbleAttached();
     }
 
     // 그리드 상의 좌표에서 가장 가까운 빈 셀에 버블을 추가한다.
@@ -207,6 +287,7 @@ public class GameGrid : MonoBehaviour {
         if(cell.IsEmpty())
         {
             cell.AttachBubble(bubble);
+            OnBubbleAttached();
         }
         else
         {
@@ -290,16 +371,20 @@ public class GameGrid : MonoBehaviour {
             }
         }   //End of while
 
+        GamePage page = (GamePage) App.Instance.CurrentPage;
+
         // 3개 이상부터 파괴!!
         if(listBubblesToDestroy.Count >= 3)
         {
             foreach(Bubble bubble in listBubblesToDestroy)
             {
-                Debug.Log(string.Format("   [{0},{1}] {2}", bubble.cell.row, bubble.cell.col, bubble.color));
-                bubble.cell.DetachBubble();
-                bubblePool.Desapwn(bubble.gameObject);
+                bubble.DestroyBubble();
+                page.Manager.Score += GameConst.SCORE_BUBBLE;
             }
 
+            // 가장 낮은 행부터 위로 검사하여 버블이 존재하는 낮은 행의 값 갱신
+            UpdateLowestBubbleRowBottomUp();
+            
             FindDisconnectedBubbles();
         }
     }
@@ -369,6 +454,10 @@ public class GameGrid : MonoBehaviour {
         {
             Bubble bubble = goBubble.GetComponent<Bubble>();        // 풀을 GameObject가 아닌 Generic으로 했으면...
 
+            // 스폰된 버블중에 cell에 할당되지 않은 버블들은 발사 대기 중인 버블
+            if (bubble.cell == null)
+                continue;
+
             if(!visitedFlags[bubble.cell.row, bubble.cell.col])
             {
                 listDisconnectedBubbles.Add(bubble);
@@ -377,8 +466,11 @@ public class GameGrid : MonoBehaviour {
         
         foreach(Bubble bubble in listDisconnectedBubbles)
         {
-            bubble.SetFalling();
+           
+            bubble.FallingBubble();
         }
+
+        UpdateLowestBubbleRowBottomUp();
     }
 
 }

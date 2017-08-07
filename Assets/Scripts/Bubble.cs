@@ -30,6 +30,9 @@ public class Bubble : MonoBehaviour
     [SerializeField]
     private SpriteRenderer spriteRenderer;
 
+    [SerializeField]
+    private SpriteRenderer subImage;
+
     private Color colorType;
 
     public Color color{
@@ -37,6 +40,9 @@ public class Bubble : MonoBehaviour
             return colorType;
         }
     }
+
+    public Trap trapType = Trap.NONE;
+    public bool isBee = false;
 
     public Cell cell = null;
     
@@ -54,12 +60,37 @@ public class Bubble : MonoBehaviour
 
         gameObject.tag = GameConst.TAG_BUBBLE;
         gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_BUBBLE);
+
+        isBee = false;
+        SetSubImage();
     }
 
-    public void SetFalling()
+    public void DestroyBubble()
     {
-        rigidbody.bodyType = RigidbodyType2D.Dynamic;
-        rigidbody.gravityScale = 5f;
+        cell.DetachBubble();
+        Desapwn();
+    }
+
+    public void Desapwn()
+    {
+        PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(gameObject);
+    }
+
+    public void FallingBubble()
+    {
+        cell.DetachBubble();
+
+        if (isBee)
+        {
+            GamePage page = (GamePage)App.Instance.CurrentPage;
+            page.Manager.OnBeeKnockdown();
+            Desapwn();
+        }
+        else
+        {
+            rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            rigidbody.gravityScale = 5f;
+        }
     }
 
     public void AddForce(Vector3 force)
@@ -69,7 +100,7 @@ public class Bubble : MonoBehaviour
     
     public void SetRandomColor()
     {
-        int colorIndex = Random.Range(0, (int)Color.MAX_COUNT);
+        int colorIndex = Random.Range(0, (int)Color.MAX_COUNT - 1);
         SetColor(colorIndex);
     }
 
@@ -89,6 +120,11 @@ public class Bubble : MonoBehaviour
         spriteRenderer.sprite = page.Manager.listBubbleSprite[colorIndex];
     }
 
+    public void SetSubImage(Sprite sprite = null)
+    {
+        subImage.sprite = sprite;
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag(GameConst.TAG_WALL))
@@ -104,6 +140,10 @@ public class Bubble : MonoBehaviour
             rigidbody.angularVelocity = 0f;
 
             SetBubble();
+
+            GamePage page = (GamePage)App.Instance.CurrentPage;
+            page.Manager.OnProjectileDestroyed();
+
             PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(this.gameObject);
         }
     }
@@ -133,6 +173,9 @@ public class Bubble : MonoBehaviour
             {
                 page.Manager.gameGrid.AddBubbleToNearCell(this.transform.localPosition, this);
             }
+
+            // 버블이 존재하는 가장 낮은 행의 값을 갱신
+            page.Manager.gameGrid.UpdateLowestBubbleRow(this);
 
             page.Manager.gameGrid.DestroySameColorBubbles(this);
         }

@@ -20,6 +20,8 @@ public class App : Singleton<App>
 
     public Page CurrentPage { get; private set; }
 
+    public GameSettings setting;
+
     // 게임의 씬 하나를 나타내는 Page 클래스
     public abstract class Page
     {

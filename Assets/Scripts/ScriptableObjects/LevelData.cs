@@ -8,7 +8,7 @@ public class LevelData : ScriptableObject
 {
     public enum LevelType
     {
-        KNOCK_DOWN,
+        KNOCK_DOWN = 0,
         COLLECT_BEEHIVE,
         INTO_POT
     }

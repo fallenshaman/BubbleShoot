@@ -20,6 +20,7 @@ public class App : Singleton<App>
 
     private void Awake()
     {
+        Application.targetFrameRate = 60;
         Screen.SetResolution(1080, 1920, true);
     }
 

@@ -140,12 +140,12 @@ public partial class GameManager : MonoBehaviour {
         float remainLength = 0f;
 
 
+        lineRenderer.gameObject.SetActive(true);
+        lineRenderer.positionCount = 2;
+
+        lineRenderer.SetPosition(0, launchPivot.position);
         if (hit.collider)
         {
-            lineRenderer.gameObject.SetActive(true);
-            lineRenderer.positionCount = 2;
-
-            lineRenderer.SetPosition(0, launchPivot.position);
             lineRenderer.SetPosition(1, hit.point);
 
             lineLength = Vector3.Distance(launchPivot.position, hit.point);
@@ -154,9 +154,6 @@ public partial class GameManager : MonoBehaviour {
         }
         else
         {
-            lineRenderer.positionCount = 2;
-
-            lineRenderer.SetPosition(0, launchPivot.position);
             lineRenderer.SetPosition(1, launchPivot.position + (launchPivot.up * settings.MaxGuideDistance));
         }
 

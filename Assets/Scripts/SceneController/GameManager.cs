@@ -106,17 +106,22 @@ public partial class GameManager : MonoBehaviour
     {
         if (IsMissionEnd)
             return;
-
-        Vector3 touchedPosition;        // 터치된 위치값(픽셀 좌표계)
-
+        
 #if UNITY_EDITOR
+        InputOnEditor();
+#elif UNITY_ANDROID || UNITY_IOS
+        InputOnMobile();
+#endif
+    }
+
+    private void InputOnEditor()
+    {
         if (Input.GetMouseButton(0))
         {
             if (EventSystem.current.IsPointerOverGameObject())
                 return;
 
-            touchedPosition = Input.mousePosition;
-            RotateLauncher(touchedPosition);
+            RotateLauncher(Input.mousePosition);
         }
 
         if (Input.GetMouseButtonUp(0))
@@ -132,25 +137,39 @@ public partial class GameManager : MonoBehaviour
         {
             SceneLoadManager.LoadScene(1);
         }
+    }
 
-#elif UNITY_ANDROID || UNITY_IOS
-        if(Input.touchCount != 0)
+    private void InputOnMobile()
+    {
+        if (Input.touchCount > 0)
         {
-            if (EventSystem.current.IsPointerOverGameObject())
+            if (IsPointerOverUIObject())
                 return;
 
             Touch touch = Input.GetTouch(0);
-
+           
             if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved)
             {
-                touchedPosition = Input.GetTouch(0).position;
-                RotateLauncher(touchedPosition);
+                RotateLauncher(Input.GetTouch(0).position);
             }
-            else if(touch.phase == TouchPhase.Ended)
+            else if (touch.phase == TouchPhase.Ended)
             {
                 LaunchBubble();
+                HideGuideLine();
             }
         }
-#endif
+    }
+
+    bool IsPointerOverUIObject()
+    {
+        // Referencing this code for GraphicRaycaster 
+        // https://gist.github.com/stramit/ead7ca1f432f3c0f181f
+        // the ray cast appears to require only eventData.position.
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
     }
 }

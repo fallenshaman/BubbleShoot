@@ -19,6 +19,7 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T> {
                         {
                             s_Instance = found[0];
                             s_Instance.gameObject.name = typeof(T).Name;
+                            DontDestroyOnLoad(s_Instance.gameObject);
 
                             return s_Instance;
                         }

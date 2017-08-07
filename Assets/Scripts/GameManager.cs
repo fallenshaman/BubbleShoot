@@ -3,23 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance
-    {
-        get
-        {
-            return (GameManager)sInstance;
-        }
-        set
-        {
-            sInstance = value;
-        }
-    }
-
-    public GameBoard gameBoard;
+    public GameGrid gameGrid;
 
     public GameSettings settings;
+
+    public LevelData levelData;
 
     [SerializeField]
     private Camera mainCam;
@@ -38,20 +28,46 @@ public class GameManager : Singleton<GameManager>
 
     public List<Sprite> listBubbleSprite = new List<Sprite>();
 
+    private GamePage page;
+
     private void Start()
     {
+        page = new GamePage(App.Instance, this);
+
         mpb = new MaterialPropertyBlock();
         launcherScreenPos = mainCam.WorldToScreenPoint(launcher.transform.position);
 
         bubblePool = PoolManager.Instance.GetPool("Bubble");
 
-        gameBoard.CreateBoard(6);
+        gameGrid.CreateGrid(levelData);
+        //gameGrid.CreateGrid(10);
     }
     
     void Update()
     {
         HandleInput();
     }
+
+    // 초기화
+    public void OnInitialize()
+    {
+    }
+
+    public void OnOpen()
+    {
+
+    }
+    
+    public void OnRelease()
+    {
+        bubblePool.DesapwnAll();
+    }
+
+    public void OnClose()
+    {
+        Debug.Log("GameClose");
+    }
+
 
     private void HandleInput()
     {
@@ -68,6 +84,12 @@ public class GameManager : Singleton<GameManager>
         {
             LaunchBubble();
         }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            SceneLoadManager.LoadScene(1);
+        }
+
 #elif UNITY_ANDROID || UNITY_IOS
         if(Input.touchCount != 0)
         {
@@ -90,7 +112,7 @@ public class GameManager : Singleton<GameManager>
     {
         Bubble projectile = bubblePool.Spawn().GetComponent<Bubble>();
         projectile.SetProjectilBubble();
-        projectile.ChangeColor();
+        projectile.SetColor(Bubble.Color.BLUE);
         projectile.transform.position = launchPivot.position;
 
         projectile.AddForce(launchPivot.up.normalized * settings.BubbleSpeed);

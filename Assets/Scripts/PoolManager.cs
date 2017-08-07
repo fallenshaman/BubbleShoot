@@ -22,20 +22,27 @@ public class PoolManager : Singleton<PoolManager>
 
     private Dictionary<string, Pool> dicPools = new Dictionary<string, Pool>();
 
-    private void Awake()
+    private bool initialized = false;
+
+    public void Initiallize()
     {
+        if (initialized)
+            return;
+
+        initialized = true;
+
         foreach (Pool pool in listPool)
         {
             pool.SetRoot(this.transform);
             pool.Preload();
 
-            if(!dicPools.ContainsKey(pool.poolName))
+            if (!dicPools.ContainsKey(pool.poolName))
             {
                 dicPools[pool.poolName] = pool;
             }
         }
     }
-    
+
     public Pool GetPool(string poolName)
     {
         Pool pool = null;
@@ -61,17 +68,28 @@ public class Pool
     public GameObject prefab;   // 풀에서 사용하는 프리펩
 
     // 풀에서 관리 되는 활성화 되어 있는 아이템 목록
-    private List<GameObject> spawnedItems = new List<GameObject>();
+    private List<GameObject> listSpawnedItems = new List<GameObject>();
     // 풀에서 관리 되는 비활성화 되어 있는 아이템 목록
-    private Stack<GameObject> despawnedItems = new Stack<GameObject>();
+    private Stack<GameObject> stackDespawnedItems = new Stack<GameObject>();
     
     public int TotalItemCount
     {
         get
         {
-            return spawnedItems.Count + despawnedItems.Count;
+            return listSpawnedItems.Count + stackDespawnedItems.Count;
         }
     }
+
+    public List<GameObject> SpawnedItems
+    {
+        get
+        {
+            return listSpawnedItems;
+        }
+    }
+
+
+    
 
     public void SetRoot(Transform _root)
     {
@@ -118,7 +136,7 @@ public class Pool
             item.parent = root;
 
             goItem.SetActive(false);
-            despawnedItems.Push(goItem);
+            stackDespawnedItems.Push(goItem);
         }
     }
 
@@ -127,14 +145,14 @@ public class Pool
         GameObject goItem = null;
 
         // 생성된 모든 아이템 사용 중이면 미리 로딩해둔 갯수 만큼 추가 로딩한다.
-        if(despawnedItems.Count == 0)
+        if(stackDespawnedItems.Count == 0)
         {
             Debug.LogError(string.Format("[Pool] pool {0} addtional load occur!!", poolName));
             Load(preLoadCount);
         }
         
-        goItem = despawnedItems.Pop();
-        spawnedItems.Add(goItem);
+        goItem = stackDespawnedItems.Pop();
+        listSpawnedItems.Add(goItem);
 
         goItem.transform.parent = null;
         goItem.SetActive(true);
@@ -144,13 +162,29 @@ public class Pool
 
     public void Desapwn(GameObject item)
     {
-        if(spawnedItems.Contains(item))
+        if(listSpawnedItems.Contains(item))
         {
             item.SetActive(false);
             item.transform.parent = root;
 
-            spawnedItems.Remove(item);
-            despawnedItems.Push(item);
+            listSpawnedItems.Remove(item);
+            stackDespawnedItems.Push(item);
+        }
+    }
+
+    public void DesapwnAll()
+    {
+        Debug.Log("DespawnALL " + listSpawnedItems.Count);
+
+        for(int i = listSpawnedItems.Count -1; i >= 0; --i)
+        {
+            GameObject item = listSpawnedItems[i];
+            
+            item.SetActive(false);
+            item.transform.parent = root;
+
+            listSpawnedItems.Remove(item);
+            stackDespawnedItems.Push(item);
         }
     }
 }

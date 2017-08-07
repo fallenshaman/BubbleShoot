@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Bubble : MonoBehaviour
 {
-    public enum ColorType
+    public enum Color
     {
         ORANGE = 0,
         RED,
@@ -16,7 +16,7 @@ public class Bubble : MonoBehaviour
         MAX_COUNT,
     }
 
-	public enum TrapType
+	public enum Trap
 	{
 		NONE,
 		FLY,
@@ -30,32 +30,36 @@ public class Bubble : MonoBehaviour
     [SerializeField]
     private SpriteRenderer spriteRenderer;
 
-    private ColorType colorType;
+    private Color colorType;
 
-    public ColorType Color{
+    public Color color{
         get {
             return colorType;
         }
     }
 
-    public Cell attachedCell = null;
-
-    private static string ProjectileTag = "Projectile";
-    private static string BubbleTag = "Bubble";
-
+    public Cell cell = null;
+    
     public void SetProjectilBubble()
     {
         rigidbody.bodyType = RigidbodyType2D.Dynamic;
-        gameObject.tag = ProjectileTag;
-        gameObject.layer = LayerMask.NameToLayer(ProjectileTag);
+        gameObject.tag = GameConst.TAG_PROJECTILE;
+        gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_PROJECTILE);
     }
 
     public void SetBubble()
     {
         rigidbody.bodyType = RigidbodyType2D.Static;
+        rigidbody.gravityScale = 0f;
 
-        gameObject.tag = BubbleTag;
-        gameObject.layer = LayerMask.NameToLayer(BubbleTag);
+        gameObject.tag = GameConst.TAG_BUBBLE;
+        gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_BUBBLE);
+    }
+
+    public void SetFalling()
+    {
+        rigidbody.bodyType = RigidbodyType2D.Dynamic;
+        rigidbody.gravityScale = 5f;
     }
 
     public void AddForce(Vector3 force)
@@ -63,79 +67,107 @@ public class Bubble : MonoBehaviour
         rigidbody.AddForce(force);
     }
     
-    public void ChangeColor()
+    public void SetRandomColor()
     {
-        int colorIndex = Random.Range(0, (int)ColorType.MAX_COUNT);
-        ChangeColor(colorIndex);
+        int colorIndex = Random.Range(0, (int)Color.MAX_COUNT);
+        SetColor(colorIndex);
     }
 
-    public void ChangeColor(int colorIndex)
+    public void SetColor(Bubble.Color color)
     {
-        if (colorIndex < 0 || (int)ColorType.MAX_COUNT <= colorIndex)
+        SetColor((int)color);
+    }
+
+    public void SetColor(int colorIndex)
+    {
+        if (colorIndex < 0 || (int)Color.MAX_COUNT <= colorIndex)
             colorIndex = 0;
 
-        spriteRenderer.sprite = GameManager.Instance.listBubbleSprite[colorIndex];
+        colorType = (Bubble.Color)colorIndex;
+
+        GamePage page = (GamePage)App.Instance.CurrentPage;
+        spriteRenderer.sprite = page.Manager.listBubbleSprite[colorIndex];
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Wall"))
+        if (collision.gameObject.CompareTag(GameConst.TAG_WALL))
         {
             Vector2 vel = rigidbody.velocity;
             vel.x *= -1f;
 
             rigidbody.velocity = vel;
         }
-        else if(collision.gameObject.CompareTag("DestroyArea"))
+        else if(collision.gameObject.CompareTag(GameConst.TAG_DESTROY_AREA))
         {
             rigidbody.velocity = Vector2.zero;
             rigidbody.angularVelocity = 0f;
 
             SetBubble();
-            PoolManager.Instance.GetPool("Bubble").Desapwn(this.gameObject);
+            PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(this.gameObject);
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(gameObject.CompareTag("Projectile") && collision.gameObject.CompareTag("Bubble"))
+        if (!gameObject.CompareTag(GameConst.TAG_PROJECTILE))
+            return;
+        
+        if(collision.gameObject.CompareTag(GameConst.TAG_BUBBLE) ||
+           collision.gameObject.CompareTag(GameConst.TAG_WALL))
         {
-            transform.parent = GameManager.Instance.gameBoard.transform;
-            
-            Bubble hittedBubble = collision.gameObject.GetComponent<Bubble>();
+            // 일반 버블 상태로 변경 
+            SetBubble();
 
-            List<Cell> listAdjacentCells = GameManager.Instance.gameBoard.GetAdjacentCells(hittedBubble.attachedCell);
+            GamePage page = (GamePage)App.Instance.CurrentPage;
 
+            transform.parent = page.Manager.gameGrid.transform;
 
-            float minDistance = float.MaxValue;
-            Cell nearCell = null;
-
-            foreach(Cell cell in listAdjacentCells)
+            // 다른 버블과 충돌
+            if (collision.gameObject.CompareTag(GameConst.TAG_BUBBLE))
             {
-                if (cell == null)
-                    continue;
-
-                if (!cell.IsEmpty())
-                    continue;
-
-                Vector3 cellPos = cell.GetPositionOnGrid();
-
-                float distance = Vector3.Distance(transform.localPosition, cellPos);
-
-                Debug.Log(string.Format("[{0},{1}] {2}", cell.row, cell.col, distance));
-
-                if(distance < minDistance)
-                {
-                    minDistance = distance;
-                    nearCell = cell;
-                }
+                Bubble hitBubble = collision.gameObject.GetComponent<Bubble>();
+                page.Manager.gameGrid.AddBubbleToNearCell(hitBubble.cell, this);
+            }
+            else if (collision.gameObject.CompareTag(GameConst.TAG_WALL))
+            {
+                page.Manager.gameGrid.AddBubbleToNearCell(this.transform.localPosition, this);
             }
 
-            SetBubble();
-            nearCell.AttachBubble(this);
-            
+            page.Manager.gameGrid.DestroySameColorBubbles(this);
         }
     }
 
+    //private void AttachToNearEmptyCell(Cell hitCell)
+    //{
+    //    // 충돌한 셀 주변의 셀을 구한다.
+    //    List<Cell> listAdjacentCells = GameManager.Instance.gameGrid.GetAdjacentCells(hitCell);
+        
+    //    float minDistance = float.MaxValue;
+    //    Cell nearCell = null;
+
+    //    foreach (Cell cell in listAdjacentCells)
+    //    {
+    //        if (cell == null)
+    //            continue;
+
+    //        if (!cell.IsEmpty())
+    //            continue;
+
+    //        Vector3 cellPos = cell.GetPositionOnGrid();
+
+    //        float distance = Vector3.Distance(transform.localPosition, cellPos);
+
+    //        Debug.Log(string.Format("[{0},{1}] {2}", cell.row, cell.col, distance));
+
+    //        if (distance < minDistance)
+    //        {
+    //            minDistance = distance;
+    //            nearCell = cell;
+    //        }
+    //    }
+        
+    //    nearCell.AttachBubble(this);
+    //}
 
 }

@@ -16,9 +16,9 @@ public partial class GameManager : PageManager
 
     private Pool bubblePool;
     private Pool flyPool;
-    
-    private GamePage page;
-    
+
+    public int levelID;
+
     private int score;
     public int Score
     {
@@ -54,20 +54,19 @@ public partial class GameManager : PageManager
 
     public override void OnPageLoaded()
     {
-        Debug.Log("GameManager OnPageLoaded");
+        // 레벨 불러오기
+        levelData = App.Instance.levelTable.listLevels[levelID];
 
         Initialize();
     }
 
     public override void OnPageShow()
     {
-        Debug.Log("GameManager OnPageShow");
         gameGrid.UpdateGridPosition();
     }
 
     public override void OnPageUnload()
     {
-        Debug.Log("GameManager OnPageUnload");
         bubblePool.DesapwnAll();
         flyPool.DesapwnAll();
     }

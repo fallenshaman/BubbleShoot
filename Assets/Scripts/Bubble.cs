@@ -194,7 +194,7 @@ public class Bubble : MonoBehaviour
 
             PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(this.gameObject);
         }
-        else if(collision.gameObject.CompareTag(GameConst.TAG_FLY))
+        else if(gameObject.CompareTag(GameConst.TAG_PROJECTILE) && collision.gameObject.CompareTag(GameConst.TAG_FLY))
         {
             Fly fly = collision.gameObject.GetComponent<Fly>();
             fly.DestroyFly();

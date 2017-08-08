@@ -174,8 +174,6 @@ public class Pool
 
     public void DesapwnAll()
     {
-        Debug.Log("DespawnALL " + listSpawnedItems.Count);
-
         for(int i = listSpawnedItems.Count -1; i >= 0; --i)
         {
             GameObject item = listSpawnedItems[i];

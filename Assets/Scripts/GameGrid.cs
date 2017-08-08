@@ -211,14 +211,20 @@ public class GameGrid : MonoBehaviour {
     private Coroutine coroutineMovement = null;
 
     // 화면에 보이는 버블의 위치를 조절한다.
+    // 총 10 행 출력
+    // 나무는 3행
     public void UpdateGridPosition()
     {
-        int hideRow = LowestBubbleRow - GameConst.GRID_VISIBILE_ROW_COUNT;
-        if (hideRow < 0)
-            hideRow = 0;
-        
+        // 총 버블의 행 수
+        int totalRowCount = LowestBubbleRow + 1;
+
         Vector3 pos = transform.position;
-        pos.y = GameConst.GRID_MIN_Y_POSITION + (hideRow * GameConst.GRID_ROW_HIDE_HEIGHT);
+
+        int hideRowCount = totalRowCount - GameConst.GRID_VISIBILE_ROW_COUNT;
+        if (hideRowCount < 0)
+            hideRowCount = 0;
+
+        pos.y = GameConst.GRID_MIN_Y_POSITION + (hideRowCount * GameConst.GRID_ROW_HIDE_HEIGHT);
 
         if (coroutineMovement != null)
             StopCoroutine(coroutineMovement);

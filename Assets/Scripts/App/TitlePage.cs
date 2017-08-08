@@ -8,7 +8,6 @@ public class TitlePage : App.Page {
     
     public TitlePage() : base()
     {
-        Debug.Log("TitlePage Constructor");
         // 타이틀 씬을 불러 온다.
         SceneLoadManager.LoadScene(GameConst.SCENE_TITLE, false);
     }

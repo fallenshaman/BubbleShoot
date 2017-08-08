@@ -6,8 +6,6 @@ using UnityEngine.SceneManagement;
 public class MapManager : PageManager {
     public override void OnPageLoaded()
     {
-        Debug.Log("MapManager OnPageLoaded");
-
         Initialize();
     }
 

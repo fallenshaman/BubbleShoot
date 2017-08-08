@@ -29,7 +29,6 @@ public partial class GameManager  {
         // 더이상 발사할 버블이 없다!
         if(RemainBubbleCount == 0)
         {
-            Debug.LogError("No more Bubbles");
             IsLaunchable = false;
 
             OnMissionFailed();

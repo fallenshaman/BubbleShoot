@@ -6,9 +6,12 @@ using UnityEngine;
 public class GamePage : App.Page {
 
     public GameManager manager;
-    
+
+    private int currentLevelID;
+
     public GamePage(int levelID) : base()
     {
+        currentLevelID = levelID;
         SceneLoadManager.LoadScene(GameConst.SCENE_GAME);
     }
 
@@ -17,7 +20,11 @@ public class GamePage : App.Page {
         manager = (GameManager)FindPageManager(GameConst.SCENE_GAME);
 
         if (manager != null)
+        {
+            manager.levelID = currentLevelID;
             manager.OnPageLoaded();
+        }
+            
     }
 
     public override void OnPageShow()

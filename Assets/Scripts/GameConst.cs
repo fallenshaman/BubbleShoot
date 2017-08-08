@@ -60,8 +60,8 @@ public class GameConst
 
     public static int GRID_SIBILING_CHILDREN_CELL_COUNT = 4;
 
-    public static int GRID_VISIBILE_ROW_COUNT = 8;
-    public static float GRID_ROW_HIDE_HEIGHT = 2.1f;
+    public static int GRID_VISIBILE_ROW_COUNT = 7;
+    public static float GRID_ROW_HIDE_HEIGHT = 1.15f;
     public static float GRID_MIN_Y_POSITION = 16.5f;
     #endregion
 

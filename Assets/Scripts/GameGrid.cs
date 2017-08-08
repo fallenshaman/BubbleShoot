@@ -376,23 +376,29 @@ public class GameGrid : MonoBehaviour {
             }
 
         }   //End of while
-
-        GamePage page = (GamePage) App.Instance.CurrentPage;
-
+        
         // 3개 이상부터 파괴!!
         if(listBubblesToDestroy.Count >= 3)
         {
-            foreach(Bubble bubble in listBubblesToDestroy)
-            {
-                bubble.DestroyBubble();
-                page.manager.Score += GameConst.SCORE_BUBBLE;
-            }
-
-            // 가장 낮은 행부터 위로 검사하여 버블이 존재하는 낮은 행의 값 갱신
-            UpdateLowestBubbleRowBottomUp();
-            
-            FindDisconnectedBubbles();
+            DestroyBubbles(listBubblesToDestroy);
         }
+    }
+
+    // 리스트로 전달받은 버블들을 파괴한다.
+    private void DestroyBubbles(List<Bubble> listBubbles)
+    {
+        GamePage page = (GamePage)App.Instance.CurrentPage;
+
+        foreach (Bubble bubble in listBubbles)
+        {
+            bubble.DestroyBubble();
+            page.manager.Score += GameConst.SCORE_BUBBLE;
+        }
+
+        // 가장 낮은 행부터 위로 검사하여 버블이 존재하는 낮은 행의 값 갱신
+        UpdateLowestBubbleRowBottomUp();
+
+        FindDisconnectedBubbles();
     }
 
     // 연결되지 않은 버블들을 찾는다.
@@ -461,7 +467,7 @@ public class GameGrid : MonoBehaviour {
             Bubble bubble = goBubble.GetComponent<Bubble>();        // 풀을 GameObject가 아닌 Generic으로 했으면...
 
             // 스폰된 버블중에 cell에 할당되지 않은 버블들은 발사 대기 중인 버블
-            if (bubble.cell == null)
+            if (!bubble.IsAttached())
                 continue;
 
             if(!visitedFlags[bubble.cell.row, bubble.cell.col])
@@ -476,6 +482,26 @@ public class GameGrid : MonoBehaviour {
         }
 
         UpdateLowestBubbleRowBottomUp();
+    }
+
+    // 입력된 버블을 중심으로 주변 버블을 파괴한다.
+    public void Hammering(Bubble bubble)
+    {
+        var adjacentCells = GetAdjacentCells(bubble.cell);
+
+        List<Bubble> listBubbles = new List<Bubble>();
+        listBubbles.Add(bubble);
+
+        foreach(Cell cell in adjacentCells)
+        {
+            if (cell.IsEmpty())
+                continue;
+
+            listBubbles.Add(cell.GetBubble());
+        }
+
+        // 중심과 주변의 버블들을 파괴한다.
+        DestroyBubbles(listBubbles);
     }
 
 }

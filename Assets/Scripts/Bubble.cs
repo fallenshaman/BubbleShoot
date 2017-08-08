@@ -56,6 +56,12 @@ public class Bubble : MonoBehaviour
 
     private Coroutine coroutineColorChanging = null;
     
+    public bool IsAttached()
+    {
+        // 부작된 셀이 존재하는가?
+        return cell != null;
+    }
+
     public void SetProjectilBubble()
     {
         rigidbody.bodyType = RigidbodyType2D.Dynamic;
@@ -94,7 +100,7 @@ public class Bubble : MonoBehaviour
         {
             CollectHive();
         }
-        else
+        else if(type == Type.NORMAL)
         {
             // 함정 처리
             if (trapType != Trap.NONE)

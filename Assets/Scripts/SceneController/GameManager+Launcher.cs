@@ -61,7 +61,7 @@ public partial class GameManager  {
     public void SwapBubble(Bubble current, Bubble next)
     {
         // 무지개 사용중일때는 버블 교체를 막는다.
-        if (activateRainbow)
+        if (ActivateRainbow)
             return;
 
         projectile = next;
@@ -96,8 +96,8 @@ public partial class GameManager  {
     // 발사체가 부착, 또는 화면 밖으로 나가 파괴되고 호출
     private void OnLaunchComplete()
     {
-        if (activateRainbow)
-            activateRainbow = false;
+        if (ActivateRainbow)
+            ActivateRainbow = false;
         
         // 새로운 발사체를 장전
         LoadProjectile();
@@ -120,8 +120,10 @@ public partial class GameManager  {
         RemainBubbleCount--;
 
         // 가이드라인 아이템 사용중일 경우
-        if (activateUnlimitGuideLine)
-            activateUnlimitGuideLine = false;
+        if (ActivateUnlimitGuideLine)
+            ActivateUnlimitGuideLine = false;
+
+        HideGuideLine();
     }
 
     // 발사대를 회전 시킨다
@@ -165,7 +167,7 @@ public partial class GameManager  {
     {
         float totalLineLength = settings.MaxGuideDistance;
 
-        if (activateUnlimitGuideLine)
+        if (ActivateUnlimitGuideLine)
             totalLineLength = 100f;
 
         // 발사할 방향으로 RayCast

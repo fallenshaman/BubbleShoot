@@ -26,6 +26,7 @@ public partial class GameManager {
 
     [Header("Item Hammer")]
     public Text txtHammerCount;
+    public GameObject goHammerNotice;
 
     [Header("Item Fireball")]
     public Text txtFireballCount;

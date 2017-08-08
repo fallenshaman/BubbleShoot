@@ -5,8 +5,21 @@ using UnityEngine.UI;
 
 public partial class GameManager {
 
-    private bool activateRainbow = false;
-    private bool activateUnlimitGuideLine = false;
+    private bool ActivateRainbow = false;
+    private bool ActivateUnlimitGuideLine = false;
+    private bool _activateHammer;
+    private bool ActivateHammer
+    {
+        get
+        {
+            return _activateHammer;
+        }
+        set
+        {
+            _activateHammer = value;
+            goHammerNotice.SetActive(_activateHammer);
+        }
+    }
 
 
     private int rainbowCount;
@@ -86,6 +99,10 @@ public partial class GameManager {
         HammerCount = 5;
         FlapperCount = 5;
         FireballCount = 5;
+
+        ActivateRainbow = false;
+        ActivateUnlimitGuideLine = false;
+        ActivateHammer = false;
     }
 
     public void OnUseRainbow()
@@ -93,11 +110,14 @@ public partial class GameManager {
         if (RainbowCount <= 0)
             return;
 
+        if (ActivateRainbow)
+            return;
+
         if (projectile == null)
             return;
 
         // 무지개 아이템 사용 활성화
-        activateRainbow = true;
+        ActivateRainbow = true;
 
         // 발사 준비중인 버블의 색을 무지개로 바꿈
         projectile.SetColor(Bubble.Color.RAINBOW);
@@ -111,8 +131,11 @@ public partial class GameManager {
         if (GuideLineCount <= 0)
             return;
 
+        if (ActivateUnlimitGuideLine)
+            return;
+
         // 가이드라인 아이템 사용 활성화
-        activateUnlimitGuideLine = true;
+        ActivateUnlimitGuideLine = true;
 
         GuideLineCount--;
     }
@@ -122,6 +145,13 @@ public partial class GameManager {
         if (HammerCount <= 0)
             return;
 
+        if (ActivateHammer)
+            return;
+
+        ActivateHammer = true;
+        goHammerNotice.SetActive(true);
+
+        HammerCount--;
     }
 
     public void OnUseFallper()

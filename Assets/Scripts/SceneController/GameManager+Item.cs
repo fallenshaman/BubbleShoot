@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public partial class GameManager {
 
     private bool activateRainbow = false;
+    private bool activateUnlimitGuideLine = false;
+
 
     private int rainbowCount;
     public int RainbowCount
@@ -109,6 +111,10 @@ public partial class GameManager {
         if (GuideLineCount <= 0)
             return;
 
+        // 가이드라인 아이템 사용 활성화
+        activateUnlimitGuideLine = true;
+
+        GuideLineCount--;
     }
 
     public void OnUseHammer()

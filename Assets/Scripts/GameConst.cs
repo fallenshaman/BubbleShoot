@@ -72,5 +72,6 @@ public class GameConst
 
 #region TRAP
     public static int TRAP_BETTLE_LIFE = 5;
-#endregion
+    public static int TRAP_ANT_LIFE = 5;
+    #endregion
 }

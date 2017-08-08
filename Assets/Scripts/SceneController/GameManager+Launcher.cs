@@ -112,9 +112,16 @@ public partial class GameManager  {
 
         if (ActivateBettle)
         {
-            bettleLifeTIme--;
-            if (bettleLifeTIme < 0)
+            bettleLifeTime--;
+            if (bettleLifeTime <= 0)
                 DestryBettle();
+        }
+
+        if(ActivateAnt)
+        {
+            antLifeTime--;
+            if (antLifeTime <= 0)
+                DestroyAnt();
         }
     }
 

@@ -5,15 +5,23 @@ using UnityEngine.UI;
 
 public partial class GameManager  {
 
-    [Header("Trap")]
+    [Header("Trap Bettle")]
     public GameObject goBettle;
-
     private bool ActivateBettle;
-    private int bettleLifeTIme;
+    private int bettleLifeTime;
 
+    [Header("Trap Ant")]
+    public GameObject goLeftPot;
+    public GameObject goRightPot;
+    private bool ActivateAnt;
+    private int antLifeTime;
+    
     public void InitializeTrap()
     {
         goBettle.SetActive(false);
+
+        goLeftPot.SetActive(true);
+        goRightPot.SetActive(true);
     }
 
     public void CreateFly()
@@ -37,12 +45,11 @@ public partial class GameManager  {
         if(flyPool.SpawnedItems.Count == 0)
             ShowFlapperButton(false);
     }
-
-
+    
     public void CreateBettle()
     {
         ActivateBettle = true;
-        bettleLifeTIme = GameConst.TRAP_BETTLE_LIFE;
+        bettleLifeTime = GameConst.TRAP_BETTLE_LIFE;
         goBettle.SetActive(true);
     }
 
@@ -50,5 +57,20 @@ public partial class GameManager  {
     {
         ActivateBettle = false;
         goBettle.SetActive(false);
+    }
+
+    public void CreateAnt()
+    {
+        ActivateAnt = true;
+        antLifeTime = GameConst.TRAP_ANT_LIFE;
+        goLeftPot.SetActive(false);
+        goRightPot.SetActive(false);
+    }
+
+    public void DestroyAnt()
+    {
+        ActivateAnt = false;
+        goLeftPot.SetActive(true);
+        goRightPot.SetActive(true);
     }
 }

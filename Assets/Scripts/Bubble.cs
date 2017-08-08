@@ -124,9 +124,13 @@ public class Bubble : MonoBehaviour
         {
             page.manager.CreateFly();
         }
-        if(trapType == Trap.BEETLE)
+        else if(trapType == Trap.BEETLE)
         {
             page.manager.CreateBettle();
+        }
+        else if(trapType == Trap.ANT)
+        {
+            page.manager.CreateAnt();
         }
     }
 

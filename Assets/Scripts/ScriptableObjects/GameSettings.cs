@@ -16,6 +16,8 @@ public class GameSettings : ScriptableObject
     public float MaxYPosition = 16.5f;
 
     [Header("Sprites")]
+    public List<Sprite> bubbleSprites;
+
     public Sprite bee;
 
     public List<Sprite> missionIcons;

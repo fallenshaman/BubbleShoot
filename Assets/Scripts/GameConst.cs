@@ -56,5 +56,7 @@ public class GameConst
     public static float GRID_MIN_Y_POSITION = 16.5f;
     #endregion
 
+    public static int BUBBLE_COLOR_RANGE = 4;
+    public static float BUBBLE_COLOR_CHANGE_TIME = 0.2f;
     
 }

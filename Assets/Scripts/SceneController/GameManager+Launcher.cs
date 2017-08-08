@@ -61,6 +61,10 @@ public partial class GameManager : MonoBehaviour {
     // 발사 버블과 다음 버블을 교체한다.
     public void SwapBubble(Bubble current, Bubble next)
     {
+        // 무지개 사용중일때는 버블 교체를 막는다.
+        if (activateRainbow)
+            return;
+
         projectile = next;
         projectile.transform.position = ProjectilePosition.position;
 
@@ -80,12 +84,22 @@ public partial class GameManager : MonoBehaviour {
     // 화면 밖으로 벗어나 발사체가 파괴됨.
     public void OnProjectileDestroyed()
     {
-        LoadProjectile();
+        OnLaunchComplete();
     }
 
     //그리드에 버블이 부착 되었을때 호출
     private void OnBubbleAttached()
     {
+        OnLaunchComplete();
+    }
+
+
+    // 발사체가 부착, 또는 화면 밖으로 나가 파괴되고 호출
+    private void OnLaunchComplete()
+    {
+        if (activateRainbow)
+            activateRainbow = false;
+
         // 새로운 발사체를 장전
         LoadProjectile();
     }

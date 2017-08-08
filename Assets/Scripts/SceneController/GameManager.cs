@@ -16,9 +16,7 @@ public partial class GameManager : MonoBehaviour
 
     private Pool bubblePool;
     private Pool flyPool;
-
-    public List<Sprite> listBubbleSprite = new List<Sprite>();
-
+    
     private GamePage page;
     
     private int score;
@@ -71,7 +69,6 @@ public partial class GameManager : MonoBehaviour
     public void OnInitialize()
     {
         gameGrid.CreateGrid(levelData);
-
         gameGrid.UpdateGridPosition();
         
         SetMissionIcon(levelData.levelType);
@@ -81,10 +78,12 @@ public partial class GameManager : MonoBehaviour
         ShowMissionSuccessPopup(false);
 
         IsMissionEnd = false;
-
+        
         Score = 0;
         MissionValue = 0;
         RemainBubbleCount = levelData.bubbleCount;
+
+        InitializeItem();
 
         LoadProjectile();
     }

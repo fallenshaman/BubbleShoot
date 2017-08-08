@@ -13,7 +13,7 @@ public class Bubble : MonoBehaviour
         GREEN,
         BLUE,
         PURPLE,
-        MAX_COUNT,
+        RAINBOW,
     }
 
 	public enum Trap
@@ -45,6 +45,8 @@ public class Bubble : MonoBehaviour
     public bool isBee = false;
 
     public Cell cell = null;
+
+    private Coroutine coroutineColorChanging = null;
     
     public void SetProjectilBubble()
     {
@@ -55,6 +57,12 @@ public class Bubble : MonoBehaviour
 
     public void SetBubble()
     {
+        if(coroutineColorChanging != null)
+        {
+            StopCoroutine(coroutineColorChanging);
+            coroutineColorChanging = null;
+        }
+
         rigidbody.bodyType = RigidbodyType2D.Static;
         rigidbody.gravityScale = 0f;
         rigidbody.velocity = Vector2.zero;
@@ -124,28 +132,41 @@ public class Bubble : MonoBehaviour
         }
     }
 
+    // 오렌지, 빨강, 녹색, 파랑  4가지중 랜덤색상 설정
     public void SetRandomColor()
     {
-        int colorIndex = Random.Range(0, (int)Color.MAX_COUNT - 1);
-        SetColor(colorIndex);
+        int colorIndex = Random.Range(0, GameConst.BUBBLE_COLOR_RANGE);
+        SetColor((Bubble.Color)colorIndex);
     }
 
     public void SetColor(Bubble.Color color)
     {
-        SetColor((int)color);
+        colorType = color;
+
+        spriteRenderer.sprite = App.Instance.setting.bubbleSprites[(int)colorType];
+        
+        if(colorType == Color.RAINBOW)
+        {
+            coroutineColorChanging = StartCoroutine(ChangeBubbleColors());
+        }
     }
 
-    public void SetColor(int colorIndex)
+    IEnumerator ChangeBubbleColors()
     {
-        if (colorIndex < 0 || (int)Color.MAX_COUNT <= colorIndex)
-            colorIndex = 0;
+        int colorIndex = 0;
 
-        colorType = (Bubble.Color)colorIndex;
+        WaitForSeconds wait = new WaitForSeconds(GameConst.BUBBLE_COLOR_CHANGE_TIME);
+        while (true)
+        {
+            spriteRenderer.sprite = App.Instance.setting.bubbleSprites[colorIndex];
+            yield return wait;
 
-        GamePage page = (GamePage)App.Instance.CurrentPage;
-        spriteRenderer.sprite = page.Manager.listBubbleSprite[colorIndex];
+            colorIndex++;
+            if (colorIndex >= GameConst.BUBBLE_COLOR_RANGE)
+                colorIndex = 0;
+        }
     }
-
+    
     public void SetSubImage(Sprite sprite = null)
     {
         subImage.sprite = sprite;

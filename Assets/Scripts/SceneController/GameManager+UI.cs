@@ -14,7 +14,47 @@ public partial class GameManager : MonoBehaviour {
 
     public GameObject missionSuccessPopup;
     public GameObject missionFailPopup;
-    
+
+    [Header("Item Rainbow")]
+    public Text txtRainbowCount;
+
+    [Header("Item GuideLine")]
+    public Text txtGuideLineCount;
+
+    [Header("Item Flapper")]
+    public Text txtFlapperCount;
+
+    [Header("Item Hammer")]
+    public Text txtHammerCount;
+
+    [Header("Item Fireball")]
+    public Text txtFireballCount;
+
+    public void OnItemRainbowClick()
+    {
+        OnUseRainbow();
+    }
+
+    public void OnItemGuideLineClick()
+    {
+        OnUseGuideLine();
+    }
+
+    public void OnItemFlapperClick()
+    {
+        OnUseFallper();
+    }
+
+    public void OnItemHammerClick()
+    {
+        OnUseHammer();
+    }
+
+    public void OnItemFireballClick()
+    {
+        OnUseFireBall();
+    }
+
     public void OnButtonOK()
     {
         SceneLoadManager.LoadScene(1);
@@ -64,5 +104,5 @@ public partial class GameManager : MonoBehaviour {
     {
         txtRemainCount.text = value.ToString();
     }
-
+    
 }

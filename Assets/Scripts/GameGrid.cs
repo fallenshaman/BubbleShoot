@@ -314,9 +314,6 @@ public class GameGrid : MonoBehaviour {
     // 버블을 기준으로 같은 색의 버블을 파괴한다.
     public void DestroySameColorBubbles(Bubble targetBubble)
     {
-        // 파괴할 버블 색
-        Bubble.Color targetColor = targetBubble.color;
-        
         // 파괴할 버블 목록
         List<Bubble> listBubblesToDestroy = new List<Bubble>();
 
@@ -338,38 +335,34 @@ public class GameGrid : MonoBehaviour {
                 continue;
 
             visitedFlags[currentCell.row, currentCell.col] = true;
-
-            //Debug.Log(string.Format("Current [{0},{1}] {2}", currentBubble.cell.row, currentBubble.cell.col, currentBubble.color));
             
-            // 현재 버블의 색이 파괴할 버블의 색과 같다.
-            if (currentBubble.color == targetColor)
+            // 파괴할 버블의 목록에 현재버블 추가
+            listBubblesToDestroy.Add(currentBubble);
+
+            // 현재 버블과 인접한 셀들을 구한다.
+            adjacentCellList.Clear();
+            adjacentCellList = GetAdjacentCells(currentCell);
+
+            foreach (Cell cell in adjacentCellList)
             {
-                // 파괴할 버블의 목록에 현재버블 추가
-                listBubblesToDestroy.Add(currentBubble);
+                // 인접 셀이 비어 있음
+                if (cell.IsEmpty())
+                    continue;
 
-                // 현재 버블과 인접한 셀들을 구한다.
-                adjacentCellList.Clear();
-                adjacentCellList = GetAdjacentCells(currentCell);
+                Bubble adjacentBubble = cell.GetBubble();
 
-                foreach (Cell cell in adjacentCellList)
+                // 인접 셀의 버블이 다른 색임
+                if (currentBubble.color == Bubble.Color.RAINBOW ||  // 현재 버블이 무지개면 모든 인접한 버블을 추가
+                    currentBubble.color == adjacentBubble.color)
                 {
-                    // 인접 셀이 비어 있음
-                    if (cell.IsEmpty())
+                    // 인접 셀의 버블이 이미 파괴 목록에 있으면 건너 뜀
+                    if (listBubblesToDestroy.Contains(adjacentBubble))
                         continue;
 
-                    Bubble bubble = cell.GetBubble();
-
-                    // 인접 셀의 버블이 다른 색임
-                    if (bubble.color != targetColor)
-                        continue;
-
-                    // 인접 셀의 버블이 이미 파괴 목록에 있음
-                    if (listBubblesToDestroy.Contains(bubble))
-                        continue;
-
-                    queue.Enqueue(bubble);
+                    queue.Enqueue(adjacentBubble);
                 }
             }
+
         }   //End of while
 
         GamePage page = (GamePage) App.Instance.CurrentPage;

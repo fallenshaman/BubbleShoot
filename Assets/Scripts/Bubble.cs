@@ -57,18 +57,34 @@ public class Bubble : MonoBehaviour
     {
         rigidbody.bodyType = RigidbodyType2D.Static;
         rigidbody.gravityScale = 0f;
+        rigidbody.velocity = Vector2.zero;
+        rigidbody.angularVelocity = 0f;
 
         gameObject.tag = GameConst.TAG_BUBBLE;
         gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_BUBBLE);
 
         isBee = false;
+        trapType = Trap.NONE;
         SetSubImage();
     }
 
     public void DestroyBubble()
     {
+        // 함정 처리
+        if (trapType != Trap.NONE)
+            ActivateTrap();
+        
         cell.DetachBubble();
         Desapwn();
+    }
+
+    private void ActivateTrap()
+    {
+        if(trapType == Trap.FLY)
+        {
+            GamePage page = (GamePage)App.Instance.CurrentPage;
+            page.Manager.CreateFly();
+        }
     }
 
     public void Desapwn()
@@ -98,6 +114,16 @@ public class Bubble : MonoBehaviour
         rigidbody.AddForce(force);
     }
     
+    public void SetTrap(Trap trap)
+    {
+        trapType = trap;
+
+        if(trapType == Trap.FLY)
+        {
+            SetSubImage(App.Instance.setting.trapIcons[(int)trapType]);
+        }
+    }
+
     public void SetRandomColor()
     {
         int colorIndex = Random.Range(0, (int)Color.MAX_COUNT - 1);
@@ -136,8 +162,17 @@ public class Bubble : MonoBehaviour
         }
         else if(collision.gameObject.CompareTag(GameConst.TAG_DESTROY_AREA))
         {
-            rigidbody.velocity = Vector2.zero;
-            rigidbody.angularVelocity = 0f;
+            SetBubble();
+
+            GamePage page = (GamePage)App.Instance.CurrentPage;
+            page.Manager.OnProjectileDestroyed();
+
+            PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(this.gameObject);
+        }
+        else if(collision.gameObject.CompareTag(GameConst.TAG_FLY))
+        {
+            Fly fly = collision.gameObject.GetComponent<Fly>();
+            fly.DestroyFly();
 
             SetBubble();
 

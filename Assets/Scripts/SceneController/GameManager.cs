@@ -15,6 +15,7 @@ public partial class GameManager : MonoBehaviour
     private MaterialPropertyBlock mpb;
 
     private Pool bubblePool;
+    private Pool flyPool;
 
     public List<Sprite> listBubbleSprite = new List<Sprite>();
 
@@ -55,7 +56,8 @@ public partial class GameManager : MonoBehaviour
         mpb = new MaterialPropertyBlock();
         launcherScreenPos = mainCam.WorldToScreenPoint(launcher.transform.position);
 
-        bubblePool = PoolManager.Instance.GetPool("Bubble");
+        bubblePool = PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE);
+        flyPool = PoolManager.Instance.GetPool(GameConst.POOL_FLY);
 
         gameGrid.OnBubbleAttached += OnBubbleAttached;
     }
@@ -95,6 +97,7 @@ public partial class GameManager : MonoBehaviour
     public void OnRelease()
     {
         bubblePool.DesapwnAll();
+        flyPool.DesapwnAll();
     }
 
     public void OnClose()
@@ -160,6 +163,7 @@ public partial class GameManager : MonoBehaviour
         }
     }
 
+    // 안드로이드 빌드에서 UGUI와 Input의 처리를 위해.
     bool IsPointerOverUIObject()
     {
         // Referencing this code for GraphicRaycaster 

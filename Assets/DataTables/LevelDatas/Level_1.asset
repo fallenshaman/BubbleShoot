@@ -55,7 +55,7 @@ MonoBehaviour:
   - cells:
     - type: 1
       color: 1
-      trap: 0
+      trap: 1
     - type: 3
       color: 0
       trap: 0
@@ -196,7 +196,7 @@ MonoBehaviour:
       trap: 0
     - type: 1
       color: 2
-      trap: 0
+      trap: 1
     - type: 0
       color: 0
       trap: 0
@@ -277,7 +277,7 @@ MonoBehaviour:
   - cells:
     - type: 1
       color: 2
-      trap: 0
+      trap: 1
     - type: 3
       color: 0
       trap: 0
@@ -418,7 +418,7 @@ MonoBehaviour:
       trap: 0
     - type: 1
       color: 1
-      trap: 0
+      trap: 1
     - type: 0
       color: 0
       trap: 0
@@ -499,7 +499,7 @@ MonoBehaviour:
   - cells:
     - type: 1
       color: 1
-      trap: 0
+      trap: 1
     - type: 3
       color: 0
       trap: 0

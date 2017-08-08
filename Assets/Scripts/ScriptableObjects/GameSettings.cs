@@ -19,4 +19,6 @@ public class GameSettings : ScriptableObject
     public Sprite bee;
 
     public List<Sprite> missionIcons;
+
+    public List<Sprite> trapIcons;
 }

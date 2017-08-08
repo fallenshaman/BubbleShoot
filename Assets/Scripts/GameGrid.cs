@@ -83,6 +83,7 @@ public class GameGrid : MonoBehaviour {
                     if (info.type == CellInfo.CellType.NORMAL)
                     {
                         bubble.SetColor(info.color);
+                        bubble.SetTrap(info.trap);
                     }
                     else if(info.type == CellInfo.CellType.BEE)
                     {

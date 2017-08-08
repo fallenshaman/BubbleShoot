@@ -5,17 +5,17 @@ using UnityEngine;
 // 게임에서 사용하는 상수들을 정의 하는 클래스
 public class GameConst
 {
-    #region
+#region SCORE
     public static int SCORE_BEE = 500;
     public static int SCORE_BUBBLE = 20;
-
 #endregion
-
+    
     #region TAG
     public static string TAG_BUBBLE = "Bubble";
     public static string TAG_WALL = "Wall";
     public static string TAG_GUIDE_WALL = "Bubble";
-
+    public static string TAG_FLY = "Fly";
+    
     public static string TAG_DESTROY_AREA = "DestroyArea";
     public static string TAG_PROJECTILE = "Projectile";
     public static string TAG_POT_HOLE = "PotHole";
@@ -29,6 +29,7 @@ public class GameConst
 
     #region POOL_NAME
     public static string POOL_BUBBLE = "Bubble";
+    public static string POOL_FLY = "Fly";
     #endregion
 
     #region GRID
@@ -53,6 +54,7 @@ public class GameConst
     public static int GRID_VISIBILE_ROW_COUNT = 8;
     public static float GRID_ROW_HIDE_HEIGHT = 2.1f;
     public static float GRID_MIN_Y_POSITION = 16.5f;
+    #endregion
 
-#endregion
+    
 }

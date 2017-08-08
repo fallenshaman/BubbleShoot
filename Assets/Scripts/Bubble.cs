@@ -24,6 +24,14 @@ public class Bubble : MonoBehaviour
 		ANT,
 	}
 
+    public enum Type
+    {
+        NORMAL = 0,
+        BEE,
+        HIVE,
+    }
+
+
     [SerializeField]
     private Rigidbody2D rigidbody;
 
@@ -42,7 +50,7 @@ public class Bubble : MonoBehaviour
     }
 
     public Trap trapType = Trap.NONE;
-    public bool isBee = false;
+    public Type type = Type.NORMAL;
 
     public Cell cell = null;
 
@@ -75,19 +83,26 @@ public class Bubble : MonoBehaviour
         gameObject.tag = GameConst.TAG_BUBBLE;
         gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_BUBBLE);
 
-        isBee = false;
+        type = Type.NORMAL;
         trapType = Trap.NONE;
         SetSubImage();
     }
 
     public void DestroyBubble()
     {
-        // 함정 처리
-        if (trapType != Trap.NONE)
-            ActivateTrap();
-        
-        cell.DetachBubble();
-        Desapwn();
+        if (type == Type.HIVE)
+        {
+            CollectHive();
+        }
+        else
+        {
+            // 함정 처리
+            if (trapType != Trap.NONE)
+                ActivateTrap();
+
+            cell.DetachBubble();
+            Desapwn();
+        }
     }
 
     private void ActivateTrap()
@@ -108,17 +123,30 @@ public class Bubble : MonoBehaviour
     {
         cell.DetachBubble();
 
-        if (isBee)
+        if (type == Type.BEE)
         {
             GamePage page = (GamePage)App.Instance.CurrentPage;
             page.manager.OnBeeKnockdown();
             Desapwn();
+        }
+        else if(type == Type.HIVE)
+        {
+            CollectHive();
         }
         else
         {
             rigidbody.bodyType = RigidbodyType2D.Dynamic;
             rigidbody.gravityScale = 5f;
         }
+    }
+
+    private void CollectHive()
+    {
+        GamePage page = (GamePage)App.Instance.CurrentPage;
+        page.manager.OnHiveCollect();
+
+        cell.DetachBubble();
+        Desapwn();
     }
 
     public void AddForce(Vector3 force)

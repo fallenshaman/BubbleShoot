@@ -59,7 +59,7 @@ public partial class GameManager  {
             
     }
 
-#region KNOCKDOWN
+    #region KNOCKDOWN
     public void OnBeeKnockdown()
     {
         if (levelData.levelType == LevelData.LevelType.KNOCK_DOWN)
@@ -69,8 +69,20 @@ public partial class GameManager  {
 
         Score += GameConst.SCORE_BEE;
     }
-
     #endregion
+
+
+    #region COLLECT_HIVE
+
+    public void OnHiveCollect()
+    {
+        if(levelData.levelType == LevelData.LevelType.COLLECT_BEEHIVE)
+        {
+            IncreseMissionValue();
+        }
+    }
+
+#endregion
 
 
     #region POT

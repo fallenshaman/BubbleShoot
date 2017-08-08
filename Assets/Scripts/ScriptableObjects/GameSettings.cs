@@ -19,6 +19,7 @@ public class GameSettings : ScriptableObject
     public List<Sprite> bubbleSprites;
 
     public Sprite bee;
+    public Sprite hive;
 
     public List<Sprite> missionIcons;
 

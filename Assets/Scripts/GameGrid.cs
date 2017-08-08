@@ -87,9 +87,15 @@ public class GameGrid : MonoBehaviour {
                     }
                     else if(info.type == CellInfo.CellType.BEE)
                     {
-                        bubble.isBee = true;
+                        bubble.type = Bubble.Type.BEE;
                         bubble.SetColor(Bubble.Color.PURPLE);
                         bubble.SetSubImage(App.Instance.setting.bee);
+                    }
+                    else if(info.type == CellInfo.CellType.HIVE)
+                    {
+                        bubble.type = Bubble.Type.HIVE;
+                        bubble.SetColor(info.color);
+                        bubble.SetSubImage(App.Instance.setting.hive);
                     }
                     
                     bubble.transform.parent = this.transform;

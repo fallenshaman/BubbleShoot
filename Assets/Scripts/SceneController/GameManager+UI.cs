@@ -57,12 +57,12 @@ public partial class GameManager {
 
     public void OnButtonOK()
     {
-        SceneLoadManager.LoadScene(1);
+        App.Instance.ChangePage(new MapPage());
     }
 
     public void OnButtonRetry()
     {
-        SceneLoadManager.LoadScene(2);
+        App.Instance.ChangePage(new GamePage(levelID));
     }
 
     public void ShowMissionSuccessPopup(bool bShow)

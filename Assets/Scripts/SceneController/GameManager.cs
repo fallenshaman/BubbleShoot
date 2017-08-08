@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public partial class GameManager : MonoBehaviour
+public partial class GameManager : PageManager
 {
     public GameGrid gameGrid;
     public GameSettings settings;
@@ -47,10 +47,34 @@ public partial class GameManager : MonoBehaviour
         }
     }
     
-    private void Start()
+    void Update()
     {
-        page = new GamePage(App.Instance, this);
+        HandleInput();
+    }
 
+    public override void OnPageLoaded()
+    {
+        Debug.Log("GameManager OnPageLoaded");
+
+        Initialize();
+    }
+
+    public override void OnPageShow()
+    {
+        Debug.Log("GameManager OnPageShow");
+        gameGrid.UpdateGridPosition();
+    }
+
+    public override void OnPageUnload()
+    {
+        Debug.Log("GameManager OnPageUnload");
+        bubblePool.DesapwnAll();
+        flyPool.DesapwnAll();
+    }
+    
+    // 초기화
+    public void Initialize()
+    {
         mpb = new MaterialPropertyBlock();
         launcherScreenPos = mainCam.WorldToScreenPoint(launcher.transform.position);
 
@@ -58,18 +82,8 @@ public partial class GameManager : MonoBehaviour
         flyPool = PoolManager.Instance.GetPool(GameConst.POOL_FLY);
 
         gameGrid.OnBubbleAttached += OnBubbleAttached;
-    }
-    
-    void Update()
-    {
-        HandleInput();
-    }
-
-    // 초기화
-    public void OnInitialize()
-    {
+        
         gameGrid.CreateGrid(levelData);
-        gameGrid.UpdateGridPosition();
         
         SetMissionIcon(levelData.levelType);
         SetMissionGoal(levelData.goal);
@@ -86,22 +100,6 @@ public partial class GameManager : MonoBehaviour
         InitializeItem();
 
         LoadProjectile();
-    }
-
-    public void OnOpen()
-    {
-        //Debug.Log(gameGrid.LowestBubbleRow);
-    }
-    
-    public void OnRelease()
-    {
-        bubblePool.DesapwnAll();
-        flyPool.DesapwnAll();
-    }
-
-    public void OnClose()
-    {
-        Debug.Log("GameClose");
     }
     
     private void HandleInput()
@@ -137,7 +135,7 @@ public partial class GameManager : MonoBehaviour
 
         if (Input.GetMouseButtonUp(1))
         {
-            SceneLoadManager.LoadScene(1);
+            App.Instance.ChangePage(new MapPage());
         }
     }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public partial class GameManager : MonoBehaviour {
+public partial class GameManager  {
     
     [Header("Launcher")]
     public Transform launcher;

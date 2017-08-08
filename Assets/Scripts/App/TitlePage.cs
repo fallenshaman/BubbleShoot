@@ -2,23 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TitlePage : App.Page {
-
-    private TitleController controller;
-    public TitlePage(App app, TitleController title) : base(app)
+    
+    public TitlePage() : base()
     {
-        controller = title;
+        Debug.Log("TitlePage Constructor");
+        // 타이틀 씬을 불러 온다.
+        SceneLoadManager.LoadScene(GameConst.SCENE_TITLE, false);
     }
     
-    public override void OnPageOpen()
+    public override void OnPageLoaded()
     {
-        controller.OnOpen();
     }
-
-    protected override void OnPageClose()
-    {
-        controller.OnClose();
-    }
-
 }

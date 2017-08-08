@@ -62,12 +62,16 @@ public class Bubble : MonoBehaviour
             StopCoroutine(coroutineColorChanging);
             coroutineColorChanging = null;
         }
+        
+        if(rigidbody.bodyType != RigidbodyType2D.Static)
+        {
+            rigidbody.velocity = Vector2.zero;
+            rigidbody.angularVelocity = 0f;
+            rigidbody.gravityScale = 0f;
 
-        rigidbody.bodyType = RigidbodyType2D.Static;
-        rigidbody.gravityScale = 0f;
-        rigidbody.velocity = Vector2.zero;
-        rigidbody.angularVelocity = 0f;
-
+            rigidbody.bodyType = RigidbodyType2D.Static;
+        }
+        
         gameObject.tag = GameConst.TAG_BUBBLE;
         gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_BUBBLE);
 
@@ -91,7 +95,7 @@ public class Bubble : MonoBehaviour
         if(trapType == Trap.FLY)
         {
             GamePage page = (GamePage)App.Instance.CurrentPage;
-            page.Manager.CreateFly();
+            page.manager.CreateFly();
         }
     }
 
@@ -107,7 +111,7 @@ public class Bubble : MonoBehaviour
         if (isBee)
         {
             GamePage page = (GamePage)App.Instance.CurrentPage;
-            page.Manager.OnBeeKnockdown();
+            page.manager.OnBeeKnockdown();
             Desapwn();
         }
         else
@@ -186,7 +190,7 @@ public class Bubble : MonoBehaviour
             SetBubble();
 
             GamePage page = (GamePage)App.Instance.CurrentPage;
-            page.Manager.OnProjectileDestroyed();
+            page.manager.OnProjectileDestroyed();
 
             PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(this.gameObject);
         }
@@ -198,7 +202,7 @@ public class Bubble : MonoBehaviour
             SetBubble();
 
             GamePage page = (GamePage)App.Instance.CurrentPage;
-            page.Manager.OnProjectileDestroyed();
+            page.manager.OnProjectileDestroyed();
 
             PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(this.gameObject);
         }
@@ -217,23 +221,23 @@ public class Bubble : MonoBehaviour
 
             GamePage page = (GamePage)App.Instance.CurrentPage;
 
-            transform.parent = page.Manager.gameGrid.transform;
+            transform.parent = page.manager.gameGrid.transform;
 
             // 다른 버블과 충돌
             if (collision.gameObject.CompareTag(GameConst.TAG_BUBBLE))
             {
                 Bubble hitBubble = collision.gameObject.GetComponent<Bubble>();
-                page.Manager.gameGrid.AddBubbleToNearCell(hitBubble.cell, this);
+                page.manager.gameGrid.AddBubbleToNearCell(hitBubble.cell, this);
             }
             else if (collision.gameObject.CompareTag(GameConst.TAG_WALL))
             {
-                page.Manager.gameGrid.AddBubbleToNearCell(this.transform.localPosition, this);
+                page.manager.gameGrid.AddBubbleToNearCell(this.transform.localPosition, this);
             }
 
             // 버블이 존재하는 가장 낮은 행의 값을 갱신
-            page.Manager.gameGrid.UpdateLowestBubbleRow(this);
+            page.manager.gameGrid.UpdateLowestBubbleRow(this);
 
-            page.Manager.gameGrid.DestroySameColorBubbles(this);
+            page.manager.gameGrid.DestroySameColorBubbles(this);
         }
     }
 

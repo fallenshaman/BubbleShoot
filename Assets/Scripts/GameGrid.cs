@@ -373,7 +373,7 @@ public class GameGrid : MonoBehaviour {
             foreach(Bubble bubble in listBubblesToDestroy)
             {
                 bubble.DestroyBubble();
-                page.Manager.Score += GameConst.SCORE_BUBBLE;
+                page.manager.Score += GameConst.SCORE_BUBBLE;
             }
 
             // 가장 낮은 행부터 위로 검사하여 버블이 존재하는 낮은 행의 값 갱신

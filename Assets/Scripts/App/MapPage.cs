@@ -5,26 +5,20 @@ using UnityEngine;
 
 public class MapPage : App.Page {
     
-    private MapController controller;
+    private MapManager manager;
 
-    public MapPage(App app, MapController map) : base(app)
+    public MapPage() : base()
     {
-        controller = map;
+        // 맵 씬을 불러온다.
+        SceneLoadManager.LoadScene(GameConst.SCENE_MAP);
     }
 
-    public override void OnPageInitialize()
+    public override void OnPageLoaded()
     {
-        controller.OnInitialize();
-    }
+        manager = (MapManager)FindPageManager(GameConst.SCENE_MAP);
 
-    public override void OnPageOpen()
-    {
-        controller.OnOpen();
-    }
-
-    protected override void OnPageClose()
-    {
-        controller.OnClose();
+        if (manager != null)
+            manager.OnPageLoaded();
     }
 
 }

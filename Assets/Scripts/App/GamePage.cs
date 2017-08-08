@@ -4,33 +4,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GamePage : App.Page {
+
+    public GameManager manager;
     
-    public GameManager Manager  { get; private set; }
-
-
-    public GamePage(App app, GameManager game) : base(app)
+    public GamePage(int levelID) : base()
     {
-        Manager = game;
+        SceneLoadManager.LoadScene(GameConst.SCENE_GAME);
     }
 
-    public override void OnPageInitialize()
+    public override void OnPageLoaded()
     {
-        Manager.OnInitialize();
+        manager = (GameManager)FindPageManager(GameConst.SCENE_GAME);
+
+        if (manager != null)
+            manager.OnPageLoaded();
     }
 
-    public override void OnPageRelease()
+    public override void OnPageShow()
     {
-        Manager.OnRelease();
+        manager.OnPageShow();
     }
 
-    public override void OnPageOpen()
+    public override void OnPageUnload()
     {
-        Manager.OnOpen();
+        manager.OnPageUnload();
     }
-
-    protected override void OnPageClose()
-    {
-        Manager.OnClose();
-    }
-
 }

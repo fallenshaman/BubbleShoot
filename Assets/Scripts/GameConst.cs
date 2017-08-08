@@ -5,7 +5,16 @@ using UnityEngine;
 // 게임에서 사용하는 상수들을 정의 하는 클래스
 public class GameConst
 {
-#region SCORE
+    #region SCENE_INDEX
+    public static int SCENE_APP = 0;
+    public static int SCENE_TITLE = 1;
+    public static int SCENE_MAP = 2;
+    public static int SCENE_GAME = 3;
+    public static int SCENE_LOADING = 4;
+    #endregion
+
+
+    #region SCORE
     public static int SCORE_BEE = 500;
     public static int SCORE_BUBBLE = 20;
 #endregion

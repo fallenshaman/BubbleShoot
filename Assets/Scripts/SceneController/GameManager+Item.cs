@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public partial class GameManager : MonoBehaviour {
+public partial class GameManager {
 
     private bool activateRainbow = false;
 

@@ -12,12 +12,10 @@ public class SceneLoadManager : MonoBehaviour
     // 로딩 타겟 씬 인덱스
     public static int targetSceneIndex = -1;
 
-    // 로딩 화면의 씬 인덱스
-    private static int loadingSceneIndex = 3;
+    private static bool useFadeEffect = true;
 
     private Scene currentScene;
 
-    //public LoadSceneMode loadSceneMode = LoadSceneMode.Single;
     public ThreadPriority loadingThreadPriority;
 
     private AsyncOperation operation;
@@ -29,16 +27,18 @@ public class SceneLoadManager : MonoBehaviour
     public AudioListener audioListener;
 
     // 입력받은 씬을 불러온다.
-    public static void LoadScene(int sceneIndex)
+    public static void LoadScene(int sceneIndex, bool useFade = true)
     {
         Application.backgroundLoadingPriority = ThreadPriority.High;
         targetSceneIndex = sceneIndex;
 
-        // 씬이 제거되기전 호출
-        App.Instance.CurrentPage.OnPageRelease();
+        useFadeEffect = useFade;
+
+        //// 씬이 제거되기전 호출
+        //App.Instance.CurrentPage.OnPageUnload();
 
         // 우선 로딩 화면의 출력을 위해 로딩 씬을 불러옴
-        SceneManager.LoadScene(loadingSceneIndex);
+        SceneManager.LoadScene(GameConst.SCENE_LOADING);
     }
 
     void Start()
@@ -53,12 +53,18 @@ public class SceneLoadManager : MonoBehaviour
 
     private IEnumerator LoadSceneAsync(int levelNum)
     {
-        ShowLoadingUIs();
+        if(useFadeEffect)
+        {
+            // 로딩 UI를 표시한다.
+            ShowLoadingUIs();
 
-        yield return null;
+            yield return null;
 
-        FadeIn();
+            // 검은 화면 페이드 인
+            FadeIn();
+        }
         
+        // 비동기로 새로운 씬을 불러 온다.
         Application.backgroundLoadingPriority = loadingThreadPriority;
         operation = SceneManager.LoadSceneAsync(levelNum, LoadSceneMode.Additive);
         
@@ -68,21 +74,30 @@ public class SceneLoadManager : MonoBehaviour
         // 로딩 스크린에 있는 AudioListener를 비활성화
         audioListener.enabled = false;
 
-        ShowLoadCompleteUIs();
+        if(useFadeEffect)
+        {
+            // 로딩 완료 UI 표시
+            ShowLoadCompleteUIs();
 
-        // 로딩 종료후 잠시 대기
-        yield return new WaitForSeconds(waitOnLoadEnd);
+            // 로딩 종료후 잠시 대기
+            yield return new WaitForSeconds(waitOnLoadEnd);
+        }
         
-        // 새로 열인 페이지 초기화 단계
-        App.Instance.CurrentPage.OnPageInitialize();
+        // 새로 열린 페이지 초기화 단계
+        App.Instance.CurrentPage.OnPageLoaded();
+        //App.Instance.CurrentPage.OnPageInitialize();
 
-        FadeOut();
-
-        // 페이드 아웃 대기
-        yield return new WaitForSeconds(fadeDuration);
-
-        App.Instance.CurrentPage.OnPageOpen();
-
+        if(useFadeEffect)
+        {
+            // 검은 화면 페이드 아웃
+            FadeOut();
+            // 페이드 아웃 대기
+            yield return new WaitForSeconds(fadeDuration);
+        }
+        
+        // 페이지가 표시됨
+        App.Instance.CurrentPage.OnPageShow();
+        
         // 로딩 씬 제거
         SceneManager.UnloadSceneAsync(currentScene);
     }

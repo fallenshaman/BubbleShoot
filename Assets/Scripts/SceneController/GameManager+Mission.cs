@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public partial class GameManager : MonoBehaviour {
+public partial class GameManager  {
 
     // true : 미션이 성공/실패 여부에 없이 끝남
     private bool IsMissionEnd;

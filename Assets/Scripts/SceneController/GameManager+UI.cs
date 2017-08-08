@@ -22,6 +22,7 @@ public partial class GameManager {
     public Text txtGuideLineCount;
 
     [Header("Item Flapper")]
+    public GameObject goFlapperButton;
     public Text txtFlapperCount;
 
     [Header("Item Hammer")]
@@ -30,6 +31,18 @@ public partial class GameManager {
 
     [Header("Item Fireball")]
     public Text txtFireballCount;
+
+    public void InitializeUI()
+    {
+        SetMissionIcon(levelData.levelType);
+        SetMissionGoal(levelData.goal);
+
+        ShowMissionFailPopup(false);
+        ShowMissionSuccessPopup(false);
+
+        ShowHammerNotice(false);
+        ShowFlapperButton(false);
+    }
 
     public void OnItemRainbowClick()
     {
@@ -106,4 +119,13 @@ public partial class GameManager {
         txtRemainCount.text = value.ToString();
     }
     
+    public void ShowHammerNotice(bool bShow)
+    {
+        goHammerNotice.SetActive(bShow);
+    }
+
+    public void ShowFlapperButton(bool bShow)
+    {
+        goFlapperButton.SetActive(bShow);
+    }
 }

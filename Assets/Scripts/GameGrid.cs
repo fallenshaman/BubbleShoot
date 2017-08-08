@@ -383,6 +383,7 @@ public class GameGrid : MonoBehaviour {
             DestroyBubbles(listBubblesToDestroy);
         }
     }
+    
 
     // 리스트로 전달받은 버블들을 파괴한다.
     private void DestroyBubbles(List<Bubble> listBubbles)
@@ -402,7 +403,7 @@ public class GameGrid : MonoBehaviour {
     }
 
     // 연결되지 않은 버블들을 찾는다.
-    private void FindDisconnectedBubbles()
+    public void FindDisconnectedBubbles()
     {
         // 1. 가장 윗 행의 모든 버블을 추가.
 

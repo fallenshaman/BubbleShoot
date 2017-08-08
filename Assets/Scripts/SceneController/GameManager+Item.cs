@@ -17,11 +17,12 @@ public partial class GameManager {
         set
         {
             _activateHammer = value;
-            goHammerNotice.SetActive(_activateHammer);
+            ShowHammerNotice(_activateHammer);
         }
     }
-
-
+    private bool ActivateFireball = false;
+    public Transform fireball;
+    
     private int rainbowCount;
     public int RainbowCount
     {
@@ -103,6 +104,7 @@ public partial class GameManager {
         ActivateRainbow = false;
         ActivateUnlimitGuideLine = false;
         ActivateHammer = false;
+        ActivateFireball = false;
     }
 
     public void OnUseRainbow()
@@ -149,8 +151,7 @@ public partial class GameManager {
             return;
 
         ActivateHammer = true;
-        goHammerNotice.SetActive(true);
-
+        
         HammerCount--;
     }
 
@@ -159,13 +160,40 @@ public partial class GameManager {
         if (FlapperCount <= 0)
             return;
 
+        List<GameObject> listFlies = flyPool.SpawnedItems;
+
+        for(int i=listFlies.Count -1; i >=0; --i)
+        {
+            Fly fly = listFlies[i].GetComponent<Fly>();
+            fly.DestroyFly();
+        }
+        
+        FlapperCount--;
     }
 
     public void OnUseFireBall()
     {
         if (FireballCount <= 0)
             return;
+        
+        if (ActivateFireball)
+            return;
 
+        if (projectile == null)
+            return;
+
+        // 파이어볼 활성화
+        ActivateFireball = true;
+
+        // 발사 준비중인 버블을 파이어볼로 변경
+        projectile.SetFireball();
+
+        fireball.parent = projectile.transform;
+        fireball.localPosition = new Vector3(0f, 0f, -1f);
+        fireball.gameObject.SetActive(true);
+
+        // 아이템 수 차감
+        FireballCount--;
     }
 
 }

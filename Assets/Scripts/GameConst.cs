@@ -27,6 +27,7 @@ public class GameConst
     
     public static string TAG_DESTROY_AREA = "DestroyArea";
     public static string TAG_PROJECTILE = "Projectile";
+    public static string TAG_FIRE_BALL = "FireBall";
     #endregion
 
     #region LAYER

@@ -12,6 +12,8 @@ public partial class GameManager  {
         fly.OnFlyDestroy = OnFlyDestroy;
 
         fly.StartFlying();
+
+        ShowFlapperButton(true);
     }
 
     private void OnFlyDestroy(Fly fly)
@@ -20,5 +22,8 @@ public partial class GameManager  {
         
         // Despawn
         flyPool.Desapwn(fly.gameObject);
+
+        if(flyPool.SpawnedItems.Count == 0)
+            ShowFlapperButton(false);
     }
 }

@@ -84,14 +84,10 @@ public partial class GameManager : PageManager
         
         gameGrid.CreateGrid(levelData);
         
-        SetMissionIcon(levelData.levelType);
-        SetMissionGoal(levelData.goal);
-
-        ShowMissionFailPopup(false);
-        ShowMissionSuccessPopup(false);
-
         IsMissionEnd = false;
-        
+
+        InitializeUI();
+
         Score = 0;
         MissionValue = 0;
         RemainBubbleCount = levelData.bubbleCount;

@@ -29,6 +29,7 @@ public class Bubble : MonoBehaviour
         NORMAL = 0,
         BEE,
         HIVE,
+        FIRE_BALL,
     }
 
 
@@ -67,6 +68,11 @@ public class Bubble : MonoBehaviour
         rigidbody.bodyType = RigidbodyType2D.Dynamic;
         gameObject.tag = GameConst.TAG_PROJECTILE;
         gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_PROJECTILE);
+    }
+
+    public void SetFireball()
+    {
+        type = Type.FIRE_BALL;
     }
 
     public void SetBubble()
@@ -241,6 +247,14 @@ public class Bubble : MonoBehaviour
 
             PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(this.gameObject);
         }
+        else if(collision.gameObject.CompareTag(GameConst.TAG_FIRE_BALL))
+        {
+            DestroyBubble();
+            GamePage page = (GamePage)App.Instance.CurrentPage;
+            page.manager.Score += GameConst.SCORE_BUBBLE;
+
+            page.manager.gameGrid.FindDisconnectedBubbles();
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -275,37 +289,4 @@ public class Bubble : MonoBehaviour
             page.manager.gameGrid.DestroySameColorBubbles(this);
         }
     }
-
-    //private void AttachToNearEmptyCell(Cell hitCell)
-    //{
-    //    // 충돌한 셀 주변의 셀을 구한다.
-    //    List<Cell> listAdjacentCells = GameManager.Instance.gameGrid.GetAdjacentCells(hitCell);
-        
-    //    float minDistance = float.MaxValue;
-    //    Cell nearCell = null;
-
-    //    foreach (Cell cell in listAdjacentCells)
-    //    {
-    //        if (cell == null)
-    //            continue;
-
-    //        if (!cell.IsEmpty())
-    //            continue;
-
-    //        Vector3 cellPos = cell.GetPositionOnGrid();
-
-    //        float distance = Vector3.Distance(transform.localPosition, cellPos);
-
-    //        Debug.Log(string.Format("[{0},{1}] {2}", cell.row, cell.col, distance));
-
-    //        if (distance < minDistance)
-    //        {
-    //            minDistance = distance;
-    //            nearCell = cell;
-    //        }
-    //    }
-        
-    //    nearCell.AttachBubble(this);
-    //}
-
 }

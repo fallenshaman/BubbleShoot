@@ -61,7 +61,7 @@ public partial class GameManager  {
     public void SwapBubble(Bubble current, Bubble next)
     {
         // 무지개 사용중일때는 버블 교체를 막는다.
-        if (ActivateRainbow)
+        if (ActivateRainbow || ActivateFireball)
             return;
 
         projectile = next;
@@ -98,7 +98,16 @@ public partial class GameManager  {
     {
         if (ActivateRainbow)
             ActivateRainbow = false;
-        
+
+        if (ActivateFireball)
+        {
+            fireball.parent = transform;
+            fireball.gameObject.SetActive(false);
+
+            ActivateFireball = false;
+        }
+            
+
         // 새로운 발사체를 장전
         LoadProjectile();
     }

@@ -1847,6 +1847,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 1660622591}
   score: 500
+--- !u!1001 &575170135
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4796117067831228, guid: 28d6858c319c7824db7ff1371ea5dde0, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4796117067831228, guid: 28d6858c319c7824db7ff1371ea5dde0, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4796117067831228, guid: 28d6858c319c7824db7ff1371ea5dde0, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4796117067831228, guid: 28d6858c319c7824db7ff1371ea5dde0, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4796117067831228, guid: 28d6858c319c7824db7ff1371ea5dde0, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4796117067831228, guid: 28d6858c319c7824db7ff1371ea5dde0, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4796117067831228, guid: 28d6858c319c7824db7ff1371ea5dde0, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4796117067831228, guid: 28d6858c319c7824db7ff1371ea5dde0, type: 2}
+      propertyPath: m_RootOrder
+      value: 17
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 28d6858c319c7824db7ff1371ea5dde0, type: 2}
+  m_IsPrefabParent: 0
+--- !u!4 &575170136 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4796117067831228, guid: 28d6858c319c7824db7ff1371ea5dde0,
+    type: 2}
+  m_PrefabInternal: {fileID: 575170135}
 --- !u!1 &576899907
 GameObject:
   m_ObjectHideFlags: 0
@@ -4792,6 +4839,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ac9560275e116c4891d5351dcd0c757, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fireball: {fileID: 575170136}
   launcher: {fileID: 450799310}
   launchPivot: {fileID: 952597904}
   ProjectilePosition: {fileID: 482097011}
@@ -4807,6 +4855,7 @@ MonoBehaviour:
   missionFailPopup: {fileID: 958456005}
   txtRainbowCount: {fileID: 1013808811}
   txtGuideLineCount: {fileID: 1443075102}
+  goFlapperButton: {fileID: 668428362}
   txtFlapperCount: {fileID: 59659635}
   txtHammerCount: {fileID: 781570761}
   goHammerNotice: {fileID: 503997589}

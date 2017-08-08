@@ -91,7 +91,8 @@ public partial class GameManager {
 
     public void OnSwapButtonClick()
     {
-        SwapBubble(projectile, nextProjectile);
+        if(CanSwapBubble)
+            SwapBubble(projectile, nextProjectile);
     }
 
     public void SetMissionIcon(LevelData.LevelType type)

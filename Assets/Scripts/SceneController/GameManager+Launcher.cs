@@ -20,6 +20,7 @@ public partial class GameManager  {
     private Bubble nextProjectile = null;
 
     private bool IsLaunchable = false;
+    private bool CanSwapBubble = false;
 
     public void LoadProjectile()
     {
@@ -55,6 +56,8 @@ public partial class GameManager  {
             nextProjectile = CreateProjectileBubble();
             nextProjectile.transform.position = NextProjectilePosition.position;
         }
+
+        CanSwapBubble = true;
     }
 
     // 발사 버블과 다음 버블을 교체한다.
@@ -138,6 +141,7 @@ public partial class GameManager  {
 
         projectile = null;
         IsLaunchable = false;
+        CanSwapBubble = false;
         
         RemainBubbleCount--;
 

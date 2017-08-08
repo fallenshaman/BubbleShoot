@@ -471,8 +471,7 @@ public class GameGrid : MonoBehaviour {
         }
         
         foreach(Bubble bubble in listDisconnectedBubbles)
-        {
-           
+        {  
             bubble.FallingBubble();
         }
 

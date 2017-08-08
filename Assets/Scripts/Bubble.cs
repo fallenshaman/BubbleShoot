@@ -135,6 +135,7 @@ public class Bubble : MonoBehaviour
         }
         else
         {
+            gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_FALLING_BUBBLE);
             rigidbody.bodyType = RigidbodyType2D.Dynamic;
             rigidbody.gravityScale = 5f;
         }

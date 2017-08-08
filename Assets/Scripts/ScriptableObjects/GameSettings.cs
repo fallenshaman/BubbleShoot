@@ -11,10 +11,7 @@ public class GameSettings : ScriptableObject
     public float MaxGuideDistance;
     public float launcherAngleLimit;
     public float GuideAnimateSpeed;
-
-    [Header("GameBoard")]
-    public float MaxYPosition = 16.5f;
-
+    
     [Header("Sprites")]
     public List<Sprite> bubbleSprites;
 

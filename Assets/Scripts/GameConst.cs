@@ -34,6 +34,7 @@ public class GameConst
     public static string LAYER_PROJECTILE = "Projectile";
     public static string LAYER_POT_HOLE = "PotHole";
     public static string LAYER_FALLING_BUBBLE = "FallingBubble";
+    public static string LAYER_GUIDE_WALL = "GuideWall";
     #endregion
 
     #region POOL_NAME

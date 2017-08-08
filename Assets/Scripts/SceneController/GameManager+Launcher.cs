@@ -141,59 +141,79 @@ public partial class GameManager  {
 
         DrawGuideLine();
     }
+    
+    private float DrawLine(LineRenderer line, Vector3 from, Vector3 to)
+    {
+        line.gameObject.SetActive(true);
+        line.positionCount = 2;
+
+        line.SetPosition(0, from);
+        line.SetPosition(1, to);
+
+        float lineLength = Vector3.Distance(from, to);
+
+        mpb.SetVector("_MainTex_ST", new Vector4(lineLength, 1f, Time.realtimeSinceStartup * -settings.GuideAnimateSpeed, 0f));
+        line.SetPropertyBlock(mpb);
+
+        return lineLength;
+    }
 
     private void DrawGuideLine()
     {
         // 발사할 방향으로 RayCast
         Ray2D ray = new Ray2D(launchPivot.position, launcher.up);
-
-        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction, settings.MaxGuideDistance, 1 << LayerMask.NameToLayer("GuideWall"));
-
-        float lineLength = settings.MaxGuideDistance;
-        float remainLength = 0f;
-
-
-        lineRenderer.gameObject.SetActive(true);
-        lineRenderer.positionCount = 2;
-
-        lineRenderer.SetPosition(0, launchPivot.position);
-        if (hit.collider)
+        
+        // 벽과 닿는지 확인한다.
+        RaycastHit2D hitGuideWall = Physics2D.Raycast(ray.origin, ray.direction, settings.MaxGuideDistance, 1 << LayerMask.NameToLayer(GameConst.LAYER_GUIDE_WALL));    
+        if (hitGuideWall.collider)
         {
-            lineRenderer.SetPosition(1, hit.point);
+            // 벽 까지 거리
+            float lineLength = DrawLine(lineRenderer, launchPivot.position, hitGuideWall.point);
 
-            lineLength = Vector3.Distance(launchPivot.position, hit.point);
+            // 남은 거리
+            float remainLength = settings.MaxGuideDistance - lineLength;
+            
+            if (remainLength > 0f)
+            {
+                Vector3 refelectVector = lineRenderer.GetPosition(1) - lineRenderer.GetPosition(0);
+                refelectVector.x *= -1f;
+                refelectVector.Normalize();
 
-            remainLength = settings.MaxGuideDistance - lineLength;
+                lineRenderer2.gameObject.SetActive(true);
+
+                // 벽에서 반사된 방향으로 RayCast
+                Ray2D rayFromWall = new Ray2D(hitGuideWall.point, refelectVector);
+
+                // 버블과 직접적으로 닿는지 확인한다.
+                RaycastHit2D hitSecondBubble = Physics2D.Raycast(rayFromWall.origin, rayFromWall.direction, remainLength, 1 << LayerMask.NameToLayer(GameConst.LAYER_BUBBLE));
+
+                if(hitSecondBubble.collider)
+                {
+                    DrawLine(lineRenderer2, hitGuideWall.point, hitSecondBubble.point);
+                }
+                else
+                {
+                    DrawLine(lineRenderer2, hitGuideWall.point, (Vector3)hitGuideWall.point + (refelectVector * remainLength));
+                }
+            }
         }
         else
         {
-            lineRenderer.SetPosition(1, launchPivot.position + (launchPivot.up * settings.MaxGuideDistance));
-        }
-
-        mpb.SetVector("_MainTex_ST", new Vector4(lineLength, 1f, Time.realtimeSinceStartup * -settings.GuideAnimateSpeed, 0f));
-        lineRenderer.SetPropertyBlock(mpb);
-
-        if (remainLength > 0f)
-        {
-            Vector3 refelectVector = lineRenderer.GetPosition(1) - lineRenderer.GetPosition(0);
-            refelectVector.x *= -1f;
-            refelectVector.Normalize();
-
-            refelectVector *= remainLength;
-
-            lineRenderer2.gameObject.SetActive(true);
-            lineRenderer2.positionCount = 2;
-            lineRenderer2.SetPosition(0, lineRenderer.GetPosition(1));
-            lineRenderer2.SetPosition(1, lineRenderer.GetPosition(1) + refelectVector);
-
-            mpb.SetVector("_MainTex_ST", new Vector4(remainLength, 1f, Time.realtimeSinceStartup * -settings.GuideAnimateSpeed, 0f));
-            lineRenderer2.SetPropertyBlock(mpb);
-        }
-        else
-        {
+            // 두번째 라인은 그리지 않는다.
             lineRenderer2.gameObject.SetActive(false);
-        }
 
+            // 버블과 직접적으로 닿는지 확인한다.
+            RaycastHit2D hitBubble = Physics2D.Raycast(ray.origin, ray.direction, settings.MaxGuideDistance, 1 << LayerMask.NameToLayer(GameConst.LAYER_BUBBLE));
+            if (hitBubble.collider)
+            {
+                DrawLine(lineRenderer, launchPivot.position, hitBubble.point);
+            }
+            else
+            {
+                // 허공
+                DrawLine(lineRenderer, launchPivot.position, launchPivot.position + (launcher.up * settings.MaxGuideDistance));
+            }
+        }
     }
 
     private void HideGuideLine()

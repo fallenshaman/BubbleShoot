@@ -299,6 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   setting: {fileID: 11400000, guid: f943bfb021855ba4fb377f6f91af6369, type: 2}
+  levelTable: {fileID: 11400000, guid: cccba3aab7aa3304086d7faaee7c95fd, type: 2}
 --- !u!4 &535801818
 Transform:
   m_ObjectHideFlags: 0

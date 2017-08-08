@@ -106,6 +106,7 @@ public class LevelDataEditor : Editor
     {
         GUILayout.BeginHorizontal();
 
+        GUI.backgroundColor = Color.white;
         if (GUILayout.Button("행 삭제"))
         {
             _target.listRows.Remove(rowData);
@@ -137,6 +138,7 @@ public class LevelDataEditor : Editor
             
             GUILayout.BeginVertical("Box", GUILayout.Width(80.0f), GUILayout.Height(80.0f));
             GUILayout.Label(string.Format("[{0},{1}]", row, i));
+
             CellInfo.CellType newType = (CellInfo.CellType)EditorGUILayout.EnumPopup(cell.type);
 
             if (newType != cell.type)

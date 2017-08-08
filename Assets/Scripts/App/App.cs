@@ -28,6 +28,8 @@ public class App : Singleton<App>
 
     public GameSettings setting;
 
+    public LevelTable levelTable;
+    
     // 게임의 씬 하나를 나타내는 Page 클래스
     public abstract class Page
     {

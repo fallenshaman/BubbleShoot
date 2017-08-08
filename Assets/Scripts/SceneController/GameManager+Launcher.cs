@@ -106,10 +106,16 @@ public partial class GameManager  {
 
             ActivateFireball = false;
         }
-            
-
+        
         // 새로운 발사체를 장전
         LoadProjectile();
+
+        if (ActivateBettle)
+        {
+            bettleLifeTIme--;
+            if (bettleLifeTIme < 0)
+                DestryBettle();
+        }
     }
 
 

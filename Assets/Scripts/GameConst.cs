@@ -69,5 +69,8 @@ public class GameConst
 
     public static int BUBBLE_COLOR_RANGE = 4;
     public static float BUBBLE_COLOR_CHANGE_TIME = 0.2f;
-    
+
+#region TRAP
+    public static int TRAP_BETTLE_LIFE = 5;
+#endregion
 }

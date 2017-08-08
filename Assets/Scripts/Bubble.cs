@@ -119,10 +119,14 @@ public class Bubble : MonoBehaviour
 
     private void ActivateTrap()
     {
-        if(trapType == Trap.FLY)
+        GamePage page = (GamePage)App.Instance.CurrentPage;
+        if (trapType == Trap.FLY)
         {
-            GamePage page = (GamePage)App.Instance.CurrentPage;
             page.manager.CreateFly();
+        }
+        if(trapType == Trap.BEETLE)
+        {
+            page.manager.CreateBettle();
         }
     }
 
@@ -170,11 +174,7 @@ public class Bubble : MonoBehaviour
     public void SetTrap(Trap trap)
     {
         trapType = trap;
-
-        if(trapType == Trap.FLY)
-        {
-            SetSubImage(App.Instance.setting.trapIcons[(int)trapType]);
-        }
+        SetSubImage(App.Instance.setting.trapIcons[(int)trapType]);
     }
 
     // 오렌지, 빨강, 녹색, 파랑  4가지중 랜덤색상 설정

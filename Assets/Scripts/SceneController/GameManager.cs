@@ -93,6 +93,7 @@ public partial class GameManager : PageManager
         RemainBubbleCount = levelData.bubbleCount;
 
         InitializeItem();
+        InitializeTrap();
 
         LoadProjectile();
     }

@@ -15,7 +15,6 @@ MonoBehaviour:
   MaxGuideDistance: 10
   launcherAngleLimit: 70
   GuideAnimateSpeed: 5
-  MaxYPosition: 16.5
   bubbleSprites:
   - {fileID: 21300000, guid: 166e1d9d9c8b81740bcf52cde0e8e129, type: 3}
   - {fileID: 21300002, guid: 166e1d9d9c8b81740bcf52cde0e8e129, type: 3}
@@ -28,6 +27,7 @@ MonoBehaviour:
   missionIcons:
   - {fileID: 21300000, guid: 2b54d3096a669844b896efc0404b173d, type: 3}
   - {fileID: 21300000, guid: 71b9d75e903a6ef41bfabe30dc255a5c, type: 3}
+  - {fileID: 21300000, guid: daf74685d4bbed143919e8617dc71f34, type: 3}
   trapIcons:
   - {fileID: 0}
   - {fileID: 21300000, guid: 6ad9763ff166f6b46b66853140a30c56, type: 3}

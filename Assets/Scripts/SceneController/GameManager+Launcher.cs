@@ -198,56 +198,55 @@ public partial class GameManager  {
 
         // 발사할 방향으로 RayCast
         Ray2D ray = new Ray2D(launchPivot.position, launcher.up);
-        
-        // 벽과 닿는지 확인한다.
-        RaycastHit2D hitGuideWall = Physics2D.Raycast(ray.origin, ray.direction, totalLineLength, 1 << LayerMask.NameToLayer(GameConst.LAYER_GUIDE_WALL));    
-        if (hitGuideWall.collider)
+
+        // 버블과 직접적으로 닿는지 확인한다.
+        RaycastHit2D hitBubble = Physics2D.Raycast(ray.origin, ray.direction, totalLineLength, 1 << LayerMask.NameToLayer(GameConst.LAYER_BUBBLE));
+        if (hitBubble.collider)
         {
-            // 벽 까지 거리
-            float lineLength = DrawLine(lineRenderer, launchPivot.position, hitGuideWall.point);
-
-            // 남은 거리
-            float remainLength = totalLineLength - lineLength;
-            
-            if (remainLength > 0f)
-            {
-                Vector3 refelectVector = lineRenderer.GetPosition(1) - lineRenderer.GetPosition(0);
-                refelectVector.x *= -1f;
-                refelectVector.Normalize();
-
-                lineRenderer2.gameObject.SetActive(true);
-
-                // 벽에서 반사된 방향으로 RayCast
-                Ray2D rayFromWall = new Ray2D(hitGuideWall.point, refelectVector);
-
-                // 버블과 직접적으로 닿는지 확인한다.
-                RaycastHit2D hitSecondBubble = Physics2D.Raycast(rayFromWall.origin, rayFromWall.direction, remainLength, 1 << LayerMask.NameToLayer(GameConst.LAYER_BUBBLE));
-
-                if(hitSecondBubble.collider)
-                {
-                    DrawLine(lineRenderer2, hitGuideWall.point, hitSecondBubble.point);
-                }
-                else
-                {
-                    DrawLine(lineRenderer2, hitGuideWall.point, (Vector3)hitGuideWall.point + (refelectVector * remainLength));
-                }
-            }
+            DrawLine(lineRenderer, launchPivot.position, hitBubble.point);
+            lineRenderer2.gameObject.SetActive(false);
         }
         else
         {
-            // 두번째 라인은 그리지 않는다.
-            lineRenderer2.gameObject.SetActive(false);
-
-            // 버블과 직접적으로 닿는지 확인한다.
-            RaycastHit2D hitBubble = Physics2D.Raycast(ray.origin, ray.direction, totalLineLength, 1 << LayerMask.NameToLayer(GameConst.LAYER_BUBBLE));
-            if (hitBubble.collider)
+            // 벽과 닿는지 확인한다.
+            RaycastHit2D hitGuideWall = Physics2D.Raycast(ray.origin, ray.direction, totalLineLength, 1 << LayerMask.NameToLayer(GameConst.LAYER_GUIDE_WALL));
+            if (hitGuideWall.collider)
             {
-                DrawLine(lineRenderer, launchPivot.position, hitBubble.point);
+                // 벽 까지 거리
+                float lineLength = DrawLine(lineRenderer, launchPivot.position, hitGuideWall.point);
+
+                // 남은 거리
+                float remainLength = totalLineLength - lineLength;
+
+                if (remainLength > 0f)
+                {
+                    Vector3 refelectVector = lineRenderer.GetPosition(1) - lineRenderer.GetPosition(0);
+                    refelectVector.x *= -1f;
+                    refelectVector.Normalize();
+
+                    lineRenderer2.gameObject.SetActive(true);
+
+                    // 벽에서 반사된 방향으로 RayCast
+                    Ray2D rayFromWall = new Ray2D(hitGuideWall.point, refelectVector);
+
+                    // 버블과 직접적으로 닿는지 확인한다.
+                    RaycastHit2D hitSecondBubble = Physics2D.Raycast(rayFromWall.origin, rayFromWall.direction, remainLength, 1 << LayerMask.NameToLayer(GameConst.LAYER_BUBBLE));
+
+                    if (hitSecondBubble.collider)
+                    {
+                        DrawLine(lineRenderer2, hitGuideWall.point, hitSecondBubble.point);
+                    }
+                    else
+                    {
+                        DrawLine(lineRenderer2, hitGuideWall.point, (Vector3)hitGuideWall.point + (refelectVector * remainLength));
+                    }
+                }
             }
             else
             {
                 // 허공
                 DrawLine(lineRenderer, launchPivot.position, launchPivot.position + (launcher.up * totalLineLength));
+                lineRenderer2.gameObject.SetActive(false);
             }
         }
     }

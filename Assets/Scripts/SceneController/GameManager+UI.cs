@@ -22,7 +22,9 @@ public partial class GameManager {
     public Text txtGuideLineCount;
 
     [Header("Item Flapper")]
-    public GameObject goFlapperButton;
+    public Button buttonFlapper;
+    public GameObject goIconFlapper;
+    public GameObject goIconLock;
     public Text txtFlapperCount;
 
     [Header("Item Hammer")]
@@ -127,6 +129,9 @@ public partial class GameManager {
 
     public void ShowFlapperButton(bool bShow)
     {
-        goFlapperButton.SetActive(bShow);
+        // goFlapperButton.SetActive(bShow);
+        buttonFlapper.interactable = bShow;
+        goIconFlapper.SetActive(bShow);
+        goIconLock.SetActive(!bShow);
     }
 }

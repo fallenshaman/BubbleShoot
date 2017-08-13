@@ -6,9 +6,11 @@ using UnityEngine;
 
 // 행의 인덱스는 밑에서 위로 증가
 public class GameGrid : MonoBehaviour {
-    
-    private Cell[,] grid;
-    private bool[,] visitedFlags;
+
+    //private Cell[,] grid;
+    private List<Cell[]> grid = new List<Cell[]>();
+
+    private List<bool[]> visitedFlags = new List<bool[]>();
 
     [SerializeField]
     private Transform roof;
@@ -33,7 +35,9 @@ public class GameGrid : MonoBehaviour {
     private int[,] ColOffset = new int[,] { 
         { -1, 0, 1, 1, 1, 0 },      // 짝수 행
         { -1, -1, 0, 1, 0, -1 }     // 홀수 행
-    };    
+    };
+
+    private LevelData levelData = null;
 
     private int[] RowOffset = new int[] { 0, -1, -1, 0, 1, 1 };
 
@@ -42,19 +46,26 @@ public class GameGrid : MonoBehaviour {
         bubblePool = PoolManager.Instance.GetPool("Bubble");
     }
     
-    public void CreateGridFromLevel(LevelData levelData)
+    public void CreateGridFromLevel(LevelData data)
     {
+        levelData = data;
         int levelRowCount = levelData.listRows.Count;
         int bubbleCount = levelData.bubbleCount;
 
         // 전체 그리드 높이
-        totalRowCount = levelRowCount + bubbleCount;        
-        
+        totalRowCount = levelRowCount + bubbleCount;
+
         // 그리드에 맞게 빈 셀 생성
-        grid = new Cell[totalRowCount, GameConst.GRID_COLUMN_COUNT];
+        for(int i =0; i < totalRowCount; ++i)
+        {
+            grid.Add(new Cell[GameConst.GRID_COLUMN_COUNT]);
+            visitedFlags.Add(new bool[GameConst.GRID_COLUMN_COUNT]);
+        }
+
+        //grid = new Cell[totalRowCount, GameConst.GRID_COLUMN_COUNT];
 
         // 방문 플래그 생성
-        visitedFlags = new bool[totalRowCount, GameConst.GRID_COLUMN_COUNT];
+        //visitedFlags = new bool[totalRowCount, GameConst.GRID_COLUMN_COUNT];
 
         float posY = 0f;
 
@@ -79,7 +90,8 @@ public class GameGrid : MonoBehaviour {
                 Vector3 positionOnGrid = new Vector3(xOffset + (col * GameConst.GRID_COLUMN_GAP), posY, 0f);
 
                 Cell cell = new Cell(row, col, positionOnGrid);
-                grid[row, col] = cell;
+                grid[row][col] = cell;
+                //grid[row, col] = cell;
                 
                 // 실제 레벨 데이타 시작 구간
                 if (row >= bubbleCount)
@@ -143,6 +155,81 @@ public class GameGrid : MonoBehaviour {
         }
     }
 
+    private void AdditionalLoad()
+    {
+        // 레벫 데이터에서 가장 밑 행에서 위로 읽어들인다.
+        float posY;
+        
+        int prevTopRow = totalRowCount;
+        totalRowCount += levelData.listRows.Count;
+
+        int row = prevTopRow;
+
+        for (int rowLevel = 0; rowLevel < levelData.listRows.Count; ++rowLevel)
+        {
+            row = prevTopRow + rowLevel;
+            
+            int columnCount = GameConst.GRID_COLUMN_COUNT;
+            float xOffset = 0;
+
+            posY = row * GameConst.NEW_GRID_ROW_GAP;
+
+            if (CheckOddEvenRow(row) == 0)   // 짝수 행
+            {
+                columnCount = GameConst.GRID_COLUMN_COUNT - 1;
+                xOffset = GameConst.GRID_EVEN_ROW_X_OFFSET;
+            }
+
+            grid.Add(new Cell[GameConst.GRID_COLUMN_COUNT]);
+            visitedFlags.Add(new bool[GameConst.GRID_COLUMN_COUNT]);
+
+            for (int col = 0; col < columnCount; ++col)
+            {
+                Vector3 positionOnGrid = new Vector3(xOffset + (col * GameConst.GRID_COLUMN_GAP), posY, 0f);
+
+                Cell cell = new Cell(row, col, positionOnGrid);
+                grid[row][col] = cell;
+                
+                CellInfo info = levelData.listRows[levelData.listRows.Count - 1 - rowLevel].cells[col];
+
+                if (info.type == CellInfo.CellType.EMPTY)
+                    continue;
+
+                GameObject goBubble = bubblePool.Spawn();
+                Bubble bubble = goBubble.GetComponent<Bubble>();
+
+                goBubble.name = string.Format("[{0}][{1}]", row, col);
+
+                cell.AttachBubble(bubble);
+
+                if (info.type == CellInfo.CellType.NORMAL)
+                {
+                    if (info.trap == Bubble.Trap.NONE)
+                        bubble.SetNormalBubble(info.color);
+                    else
+                        bubble.SetTrapBubble(info.color, info.trap);
+                }
+                else if (info.type == CellInfo.CellType.BEE)
+                {
+                    bubble.SetBeeBubble();
+                }
+                else if (info.type == CellInfo.CellType.HIVE)
+                {
+                    bubble.SetState(Bubble.Type.HIVE);
+                    bubble.type = Bubble.Type.HIVE;
+                    bubble.SetColor(info.color);
+                    bubble.SetSubImage(App.Instance.setting.hive);
+                }
+
+                bubble.transform.parent = this.transform;
+                bubble.transform.localPosition = positionOnGrid;
+            }
+        }
+
+        rowTopBubble = row;
+
+    }
+
     // 행이 홀수 행인지 짝수행인지 반환
     // 0 : 짝수
     // 1 : 홀수
@@ -179,9 +266,9 @@ public class GameGrid : MonoBehaviour {
         
             if (0 <= adjCol && adjCol < GameConst.GRID_COLUMN_COUNT && 0 <= adjRow && adjRow < totalRowCount)
             {
-                if(grid[adjRow, adjCol] != null)
+                if(grid[adjRow][adjCol] != null)
                 {
-                    listAdjacentCell.Add(grid[adjRow, adjCol]);
+                    listAdjacentCell.Add(grid[adjRow][adjCol]);
                 }
             }
         }
@@ -206,7 +293,7 @@ public class GameGrid : MonoBehaviour {
         {
             for(int col = 0; col < GameConst.GRID_COLUMN_COUNT; ++col)
             {
-                Cell cell = grid[row, col];
+                Cell cell = grid[row][col];
 
                 if (cell != null && !cell.IsEmpty())
                 {
@@ -337,7 +424,7 @@ public class GameGrid : MonoBehaviour {
         
         int col = (int)((posX + (GameConst.GRID_COLUMN_GAP * 0.5f)) / GameConst.GRID_COLUMN_GAP);
 
-        return grid[row, col];
+        return grid[row][col];
     }
 
 
@@ -354,17 +441,23 @@ public class GameGrid : MonoBehaviour {
         List<Cell> adjacentCellList = new List<Cell>();
 
         // 방문 플래그 초기화
-        Array.Clear(visitedFlags, 0, totalRowCount * GameConst.GRID_COLUMN_COUNT);
+        //Array.Clear(visitedFlags, 0, totalRowCount * GameConst.GRID_COLUMN_COUNT);
+        for(int i =0; i < visitedFlags.Count; ++i)
+        {
+            for (int j = 0; j < GameConst.GRID_COLUMN_COUNT; ++j)
+                visitedFlags[i][j] = false;
+        }
+
 
         while (queue.Count > 0)
         {
             Bubble currentBubble = queue.Dequeue();
             Cell currentCell = currentBubble.cell;
 
-            if (visitedFlags[currentCell.row, currentCell.col])
+            if (visitedFlags[currentCell.row][currentCell.col])
                 continue;
 
-            visitedFlags[currentCell.row, currentCell.col] = true;
+            visitedFlags[currentCell.row][currentCell.col] = true;
             
             // 파괴할 버블의 목록에 현재버블 추가
             listBubblesToDestroy.Add(currentBubble);
@@ -433,18 +526,23 @@ public class GameGrid : MonoBehaviour {
         // << 예외 : 발사 준비, 다음 버블은 예외 처리 해야함. >>
 
         Queue<Bubble> queue = new Queue<Bubble>();
-        
+
         // 방문 플래그 초기화
-        Array.Clear(visitedFlags, 0, totalRowCount * GameConst.GRID_COLUMN_COUNT);
+        //Array.Clear(visitedFlags, 0, totalRowCount * GameConst.GRID_COLUMN_COUNT);
+        for (int i = 0; i < visitedFlags.Count; ++i)
+        {
+            for (int j = 0; j < GameConst.GRID_COLUMN_COUNT; ++j)
+                visitedFlags[i][j] = false;
+        }
 
         int topRow = totalRowCount - 1;
         for (int i =0; i < GameConst.GRID_COLUMN_COUNT; ++i)
         {
             // 비여 있는 셀은 건너 뜀.
-            if (grid[topRow, i].IsEmpty())
+            if (grid[topRow][i].IsEmpty())
                 continue;
 
-            queue.Enqueue(grid[topRow, i].GetBubble());
+            queue.Enqueue(grid[topRow][i].GetBubble());
         }
 
         while(queue.Count > 0)
@@ -454,10 +552,10 @@ public class GameGrid : MonoBehaviour {
             int row = currentBubble.cell.row;
             int col = currentBubble.cell.col;
 
-            if (visitedFlags[row, col])
+            if (visitedFlags[row][col])
                 continue;
 
-            visitedFlags[row, col] = true;
+            visitedFlags[row][col] = true;
 
             int rowMod = CheckOddEvenRow(row);       // 0 == 짝수행 , 1 = 홀수행
             
@@ -470,11 +568,11 @@ public class GameGrid : MonoBehaviour {
                 if (0 <= adjCol && adjCol < GameConst.GRID_COLUMN_COUNT && 0 <= adjRow && adjRow < totalRowCount)
                 {
                     // 셀이 존재하고, 셀에 버블이 있음.
-                    if (grid[adjRow, adjCol] != null && !grid[adjRow, adjCol].IsEmpty())
+                    if (grid[adjRow][adjCol] != null && !grid[adjRow][adjCol].IsEmpty())
                     {
                         // 방문하지 않은 셀이면 추가
-                        if (!visitedFlags[adjRow, adjCol])
-                            queue.Enqueue(grid[adjRow, adjCol].GetBubble());
+                        if (!visitedFlags[adjRow][adjCol])
+                            queue.Enqueue(grid[adjRow][adjCol].GetBubble());
                     }
                 }
             }
@@ -490,7 +588,7 @@ public class GameGrid : MonoBehaviour {
             if (!bubble.IsAttached())
                 continue;
 
-            if(!visitedFlags[bubble.cell.row, bubble.cell.col])
+            if(!visitedFlags[bubble.cell.row][bubble.cell.col])
             {
                 listDisconnectedBubbles.Add(bubble);
             }
@@ -502,6 +600,17 @@ public class GameGrid : MonoBehaviour {
         }
 
         UpdateLowestBubbleRowBottomUp();
+
+        if(levelData.levelType == LevelData.LevelType.INTO_POT)
+        {
+            // 남은 버블 행 수가 레벨의 행보다 작으면 
+            if (rowTopBubble - rowBottomBubble < levelData.listRows.Count - 1)
+            {
+                Debug.Log(string.Format("{0} - {1} < {2}", rowTopBubble, rowBottomBubble, levelData.listRows.Count));
+
+                AdditionalLoad();
+            }
+        }
     }
 
     // 입력된 버블을 중심으로 주변 버블을 파괴한다.

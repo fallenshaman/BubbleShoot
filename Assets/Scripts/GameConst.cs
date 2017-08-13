@@ -43,15 +43,23 @@ public class GameConst
     public static string POOL_FLY = "Fly";
     #endregion
 
+    #region GRID_new
+    // 게임 그리드의 행간 간격
+    public static float NEW_GRID_ROW_GAP = 1.1f;
+    public static int NEW_GRID_ROW_VISIBILE_COUNT = 12;
+    public static int NEW_GRID_ROW_VISIBILE_COUNT_ROOF = 9;
+
+
+    #endregion
+
+
     #region GRID
     // 게임 그리드의 가로 셀 수
     public static int GRID_COLUMN_COUNT = 12;
 
     // 게임 그리드의 열간 간격
     public static float GRID_COLUMN_GAP = 1.3f;
-
-    // 게임 그리드의 행간 간격
-    public static float GRID_ROW_GAP = 1.15f;
+    
 
     // 짝수 열의 X좌표 Offset
     public static float GRID_EVEN_ROW_X_OFFSET = 0.65f;

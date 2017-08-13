@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-public class Bubble : MonoBehaviour
+public partial class Bubble : MonoBehaviour
 {
     public enum Color
     {
@@ -27,6 +25,9 @@ public class Bubble : MonoBehaviour
     public enum Type
     {
         NORMAL = 0,
+        TRAP,
+        PROJECTILE,
+        FALLING,
         BEE,
         HIVE,
         FIRE_BALL,
@@ -56,57 +57,31 @@ public class Bubble : MonoBehaviour
     public Cell cell = null;
 
     private Coroutine coroutineColorChanging = null;
-    
+
+    private void Awake()
+    {
+        InitializeStates();
+
+        SetNormalBubble(Color.ORANGE);
+    }
+
     public bool IsAttached()
     {
         // 부작된 셀이 존재하는가?
         return cell != null;
     }
-
-    public void SetProjectilBubble()
-    {
-        rigidbody.bodyType = RigidbodyType2D.Dynamic;
-        gameObject.tag = GameConst.TAG_PROJECTILE;
-        gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_PROJECTILE);
-    }
-
-    public void SetFireball()
-    {
-        type = Type.FIRE_BALL;
-    }
-
-    public void SetBubble()
-    {
-        if(coroutineColorChanging != null)
-        {
-            StopCoroutine(coroutineColorChanging);
-            coroutineColorChanging = null;
-        }
-        
-        if(rigidbody.bodyType != RigidbodyType2D.Static)
-        {
-            rigidbody.velocity = Vector2.zero;
-            rigidbody.angularVelocity = 0f;
-            rigidbody.gravityScale = 0f;
-
-            rigidbody.bodyType = RigidbodyType2D.Static;
-        }
-        
-        gameObject.tag = GameConst.TAG_BUBBLE;
-        gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_BUBBLE);
-
-        type = Type.NORMAL;
-        trapType = Trap.NONE;
-        SetSubImage();
-    }
-
-    public void DestroyBubble()
+  
+    // 버블이 파괴 되었을때
+    public void OnDestroyed()
     {
         if (type == Type.HIVE)
         {
             CollectHive();
+
+            cell.DetachBubble();
+            Desapwn();
         }
-        else if(type == Type.NORMAL)
+        else if(type == Type.TRAP)
         {
             // 함정 처리
             if (trapType != Trap.NONE)
@@ -115,7 +90,43 @@ public class Bubble : MonoBehaviour
             cell.DetachBubble();
             Desapwn();
         }
+        else if(type == Type.NORMAL)
+        {
+            cell.DetachBubble();
+            Desapwn();
+        }
+        else if (type == Type.BEE)
+        {
+            GamePage page = (GamePage)App.Instance.CurrentPage;
+            page.manager.OnBeeKnockdown();
+            cell.DetachBubble();
+            Desapwn();
+        }
     }
+
+    // 다른 버블과의 연결이 끊어짐
+    public void OnDisconnected()
+    {
+        if (type == Type.BEE)
+        {
+            GamePage page = (GamePage)App.Instance.CurrentPage;
+            page.manager.OnBeeKnockdown();
+            cell.DetachBubble();
+            Desapwn();
+        }
+        else if (type == Type.HIVE)
+        {
+            CollectHive();
+            cell.DetachBubble();
+            Desapwn();
+        }
+        else
+        {
+            cell.DetachBubble();
+            SetFallingBubble();
+        }
+    }
+
 
     private void ActivateTrap()
     {
@@ -136,38 +147,17 @@ public class Bubble : MonoBehaviour
 
     public void Desapwn()
     {
+        SetNormalBubble();
+
         PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(gameObject);
     }
 
-    public void FallingBubble()
-    {
-        cell.DetachBubble();
-
-        if (type == Type.BEE)
-        {
-            GamePage page = (GamePage)App.Instance.CurrentPage;
-            page.manager.OnBeeKnockdown();
-            Desapwn();
-        }
-        else if(type == Type.HIVE)
-        {
-            CollectHive();
-        }
-        else
-        {
-            gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_FALLING_BUBBLE);
-            rigidbody.bodyType = RigidbodyType2D.Dynamic;
-            rigidbody.gravityScale = 5f;
-        }
-    }
+    
 
     private void CollectHive()
     {
         GamePage page = (GamePage)App.Instance.CurrentPage;
         page.manager.OnHiveCollect();
-
-        cell.DetachBubble();
-        Desapwn();
     }
 
     public void AddForce(Vector3 force)
@@ -175,11 +165,6 @@ public class Bubble : MonoBehaviour
         rigidbody.AddForce(force);
     }
     
-    public void SetTrap(Trap trap)
-    {
-        trapType = trap;
-        SetSubImage(App.Instance.setting.trapIcons[(int)trapType]);
-    }
 
     // 오렌지, 빨강, 녹색, 파랑  4가지중 랜덤색상 설정
     public void SetRandomColor()
@@ -232,35 +217,33 @@ public class Bubble : MonoBehaviour
         }
         else if(collision.gameObject.CompareTag(GameConst.TAG_DESTROY_AREA))
         {
-            SetBubble();
-
             GamePage page = (GamePage)App.Instance.CurrentPage;
             page.manager.OnProjectileDestroyed();
 
-            PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(this.gameObject);
+            Desapwn();
         }
         else if(gameObject.CompareTag(GameConst.TAG_PROJECTILE) && collision.gameObject.CompareTag(GameConst.TAG_FLY))
         {
             Fly fly = collision.gameObject.GetComponent<Fly>();
             fly.DestroyFly();
-
-            SetBubble();
-
+            
             GamePage page = (GamePage)App.Instance.CurrentPage;
             page.manager.OnProjectileDestroyed();
 
-            PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE).Desapwn(this.gameObject);
+            Desapwn();
         }
         else if(collision.gameObject.CompareTag(GameConst.TAG_FIRE_BALL))
         {
-            DestroyBubble();
+            Debug.Log("Triggered with fireball : " + gameObject.name);
+
+            OnDestroyed();
             GamePage page = (GamePage)App.Instance.CurrentPage;
             page.manager.Score += GameConst.SCORE_BUBBLE;
 
             page.manager.gameGrid.FindDisconnectedBubbles();
         }
     }
-
+    
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (!gameObject.CompareTag(GameConst.TAG_PROJECTILE))
@@ -269,8 +252,10 @@ public class Bubble : MonoBehaviour
         if(collision.gameObject.CompareTag(GameConst.TAG_BUBBLE) ||
            collision.gameObject.CompareTag(GameConst.TAG_WALL))
         {
+            Debug.Log("Collision with bubble " + gameObject.name);
+
             // 일반 버블 상태로 변경 
-            SetBubble();
+            SetNormalBubble();
 
             GamePage page = (GamePage)App.Instance.CurrentPage;
 
@@ -289,7 +274,6 @@ public class Bubble : MonoBehaviour
 
             // 버블이 존재하는 가장 낮은 행의 값을 갱신
             page.manager.gameGrid.UpdateLowestBubbleRow(this);
-
             page.manager.gameGrid.DestroySameColorBubbles(this);
         }
     }

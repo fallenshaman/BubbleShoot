@@ -3,154 +3,160 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// 행의 인덱스는 밑에서 위로 증가
 public class GameGrid : MonoBehaviour {
     
     private Cell[,] grid;
     private bool[,] visitedFlags;
 
+    [SerializeField]
+    private Transform roof;
+
     private Pool bubblePool;
 
-    private int gridRowCount;
+    private int totalRowCount;
+
+    //private int rowBottomBubble;
+    private int rowTopBubble;
+    // 버블이 부착되어 있는 가장 낮은 행의 번호
+    public int rowBottomBubble { get; private set; }
 
     public Action OnBubbleAttached = () => { };
 
-    // 버블이 부탁되어 있는 가장 낮은 행의 번호
-    public int LowestBubbleRow { get; private set; }
+    public float scrollSpeed;
 
     // 주변 셀 검색시 사용할 Offset 값들
     // 좌, 좌하, 우하, 우, 우상, 좌상 순서임.
     // 인접 셀 검색시에는 전체 (0 ~ 5) 사용
     // 연결되지 않은  셀 검색 시에는 (0 ~ 3) 사용
     private int[,] ColOffset = new int[,] { 
-        { -1, -1, 0, 1, 0, -1 },    // 홀수 행
-        { -1, 0, 1, 1, 1, 0 } };    // 짝수 행
+        { -1, 0, 1, 1, 1, 0 },      // 짝수 행
+        { -1, -1, 0, 1, 0, -1 }     // 홀수 행
+    };    
 
-    private int[] RowOffset = new int[] { 0, 1, 1, 0, -1, -1 };
+    private int[] RowOffset = new int[] { 0, -1, -1, 0, 1, 1 };
 
     private void Start()
     {
         bubblePool = PoolManager.Instance.GetPool("Bubble");
     }
-
-    // 레벨 데이타를 이용해 게임 그리드 생성
-    public void CreateGrid(LevelData levelData)
+    
+    public void CreateGridFromLevel(LevelData levelData)
     {
+        int levelRowCount = levelData.listRows.Count;
+        int bubbleCount = levelData.bubbleCount;
+
         // 전체 그리드 높이
-        gridRowCount = levelData.listRows.Count + GameConst.GRID_ADDITIONAL_ROW_COUNT;
-
-        // 레벨 데이터가 상의 마지막 행이 가장 마지막 버블이 위치하는 행이다.
-        LowestBubbleRow = levelData.listRows.Count - 1; 
-
-        grid = new Cell[gridRowCount, GameConst.GRID_COLUMN_COUNT];
-        visitedFlags = new bool[gridRowCount, GameConst.GRID_COLUMN_COUNT];
+        totalRowCount = levelRowCount + bubbleCount;        
         
+        // 그리드에 맞게 빈 셀 생성
+        grid = new Cell[totalRowCount, GameConst.GRID_COLUMN_COUNT];
+
+        // 방문 플래그 생성
+        visitedFlags = new bool[totalRowCount, GameConst.GRID_COLUMN_COUNT];
+
         float posY = 0f;
-        
-        for (int row = 0; row < gridRowCount; ++row)
+
+        rowBottomBubble = bubbleCount;
+        rowTopBubble = totalRowCount - 1;
+
+        for (int row = 0; row < totalRowCount; ++row)
         {
-            posY = row * GameConst.GRID_ROW_GAP;
-            
-            // 이번 행에 위치하는 셀의 수 (홀수 행 : 12, 짝수 행 11)
             int columnCount = GameConst.GRID_COLUMN_COUNT;
             float xOffset = 0;
 
-            // 짝수 행
-            if (row % 2 == 1)
+            posY = row * GameConst.NEW_GRID_ROW_GAP;
+
+            if (CheckOddEvenRow(row) == 0)   // 짝수 행
             {
                 columnCount = GameConst.GRID_COLUMN_COUNT - 1;
                 xOffset = GameConst.GRID_EVEN_ROW_X_OFFSET;
             }
-            
+
             for (int col = 0; col < columnCount; ++col)
             {
-                Cell cell = new Cell(row, col);
-                grid[row, col] = cell;
+                Vector3 positionOnGrid = new Vector3(xOffset + (col * GameConst.GRID_COLUMN_GAP), posY, 0f);
 
-                // 레벨 데이타가 존재하는 행.
-                if(row < levelData.listRows.Count)
+                Cell cell = new Cell(row, col, positionOnGrid);
+                grid[row, col] = cell;
+                
+                // 실제 레벨 데이타 시작 구간
+                if (row >= bubbleCount)
                 {
-                    CellInfo info = levelData.listRows[row].cells[col];
+                    int levelRow = row - bubbleCount;
+
+                    CellInfo info = levelData.listRows[levelRowCount - 1 - levelRow].cells[col];
 
                     if (info.type == CellInfo.CellType.EMPTY)
                         continue;
 
                     GameObject goBubble = bubblePool.Spawn();
                     Bubble bubble = goBubble.GetComponent<Bubble>();
-                    bubble.SetBubble();
+                    
+                    goBubble.name = string.Format("[{0}][{1}]", row, col);
 
                     cell.AttachBubble(bubble);
 
                     if (info.type == CellInfo.CellType.NORMAL)
                     {
-                        bubble.SetColor(info.color);
-                        bubble.SetTrap(info.trap);
+                        if (info.trap == Bubble.Trap.NONE)
+                            bubble.SetNormalBubble(info.color);
+                        else
+                            bubble.SetTrapBubble(info.color, info.trap);
                     }
-                    else if(info.type == CellInfo.CellType.BEE)
+                    else if (info.type == CellInfo.CellType.BEE)
                     {
-                        bubble.type = Bubble.Type.BEE;
-                        bubble.SetColor(Bubble.Color.PURPLE);
-                        bubble.SetSubImage(App.Instance.setting.bee);
+                        bubble.SetBeeBubble();
                     }
-                    else if(info.type == CellInfo.CellType.HIVE)
+                    else if (info.type == CellInfo.CellType.HIVE)
                     {
+                        bubble.SetState(Bubble.Type.HIVE);
                         bubble.type = Bubble.Type.HIVE;
                         bubble.SetColor(info.color);
                         bubble.SetSubImage(App.Instance.setting.hive);
                     }
-                    
-                    bubble.transform.parent = this.transform;
-                    bubble.transform.localPosition = new Vector3(xOffset + (col * GameConst.GRID_COLUMN_GAP), -posY, 0f);
-                }
-            }   
-        }   // End of row
-    }
-
-    public void CreateGrid(int height)
-    {
-        gridRowCount = height + GameConst.GRID_ADDITIONAL_ROW_COUNT;
-
-        grid = new Cell[gridRowCount, GameConst.GRID_COLUMN_COUNT];
-        visitedFlags = new bool[gridRowCount, GameConst.GRID_COLUMN_COUNT];
-
-        float posY = 0f;
-        
-        for (int row = 0; row < gridRowCount; ++row)
-        {
-            posY = row * GameConst.GRID_ROW_GAP;
-
-            int colCount = GameConst.GRID_COLUMN_COUNT;
-            float xOffset = 0;
-
-            // 짝수 줄
-            if (row % 2 == 1)
-            {
-                colCount = GameConst.GRID_COLUMN_COUNT - 1;
-                xOffset = GameConst.GRID_EVEN_ROW_X_OFFSET;
-            }
-            
-            for (int col = 0; col < colCount; ++col)
-            {
-                Cell cell = new Cell(row, col);
-
-                grid[row, col] = cell;
-                
-                if(row < height)
-                {
-                    GameObject goBubble = bubblePool.Spawn();
-                    Bubble bubble = goBubble.GetComponent<Bubble>();
-                    bubble.SetBubble();
-
-                    cell.AttachBubble(bubble);
-
-                    bubble.SetRandomColor();
 
                     bubble.transform.parent = this.transform;
-                    bubble.transform.localPosition = new Vector3(xOffset + (col * GameConst.GRID_COLUMN_GAP), -posY, 0f);
+                    bubble.transform.localPosition = positionOnGrid;
                 }
             }
+
+            Vector3 gridPos = transform.localPosition;
+
+            if (levelData.levelType == LevelData.LevelType.INTO_POT)
+            {
+                // 무한 반복
+                gridPos.y = -(totalRowCount - GameConst.NEW_GRID_ROW_VISIBILE_COUNT) * GameConst.NEW_GRID_ROW_GAP;
+
+                roof.gameObject.SetActive(false);
+            }
+            else
+            {
+                gridPos.y = -(totalRowCount - GameConst.NEW_GRID_ROW_VISIBILE_COUNT_ROOF) * GameConst.NEW_GRID_ROW_GAP;
+
+                roof.gameObject.SetActive(true);
+                roof.transform.localPosition = new Vector3(7.15f, posY + 0.5f, 0f);
+            }
+
+            transform.localPosition = gridPos;
         }
     }
 
+    // 행이 홀수 행인지 짝수행인지 반환
+    // 0 : 짝수
+    // 1 : 홀수
+    private int CheckOddEvenRow(int row)
+    {
+        if(row > totalRowCount)
+        {
+            Debug.LogError("Row out of range!!");
+            return 0;
+        }
+        
+        return (totalRowCount - row) % 2;
+    }
+    
     public List<Cell> GetAdjacentCells(Cell cell)
     {
         return GetAdjacentCells(cell.row, cell.col);
@@ -163,19 +169,15 @@ public class GameGrid : MonoBehaviour {
 
         // 입력 받은 위치의 행이 홀수일 때와 짝수일때 인접 Cell의 X 인덱스 구하는 방식이 다름
         
-        int rowMod = row % 2;       // 0 == 홀수행 , 1 = 짝수행
-
-        //Debug.Log(string.Format("Check [{0},{1}]", row, col));
-
+        int rowMod = CheckOddEvenRow(row);     // 0 : 짝수 , 1 : 홀수
+        
         // 인접한 셀 6개를 검사한다.
         for (int i =0; i < GameConst.GRID_ADJACENT_CELL_COUNT; ++i)
         {
             int adjRow = row + RowOffset[i];
             int adjCol = col + ColOffset[rowMod, i];
-            
-            //Debug.Log(string.Format("   Checking [{0},{1}]", adjRow, adjCol));
-
-            if (0 <= adjCol && adjCol < GameConst.GRID_COLUMN_COUNT && 0 <= adjRow && adjRow < gridRowCount)
+        
+            if (0 <= adjCol && adjCol < GameConst.GRID_COLUMN_COUNT && 0 <= adjRow && adjRow < totalRowCount)
             {
                 if(grid[adjRow, adjCol] != null)
                 {
@@ -190,15 +192,17 @@ public class GameGrid : MonoBehaviour {
     // 새로운 버블을 기준으로 가장 마지막 버블이 존재하는 행 값을 갱신한다.
     public void UpdateLowestBubbleRow(Bubble newBubble)
     {
-        // 새로 버블이 부착된 Cell의 행이 크면 마지막 행값을 갱신
-        LowestBubbleRow = Mathf.Max(LowestBubbleRow, newBubble.cell.row);
+        // 새로 버블이 부착된 Cell의 행이 작으면 마지막 행값을 갱신
+        rowBottomBubble = Mathf.Min(rowBottomBubble, newBubble.cell.row);
 
-        UpdateGridPosition();
+        ScrollToRow(rowBottomBubble);
     }
 
+
+    // 현재 가장 낮은 버블의 위치에서 위로 검색하면서 새로운 가장 낮은 버블의 위치를 찾는다.
     public void UpdateLowestBubbleRowBottomUp()
     {
-        for(int row = LowestBubbleRow; row >= 0; --row)
+        for(int row = rowBottomBubble; row < totalRowCount; ++row)
         {
             for(int col = 0; col < GameConst.GRID_COLUMN_COUNT; ++col)
             {
@@ -206,8 +210,8 @@ public class GameGrid : MonoBehaviour {
 
                 if (cell != null && !cell.IsEmpty())
                 {
-                    LowestBubbleRow = row;
-                    UpdateGridPosition();
+                    rowBottomBubble = row;
+                    ScrollToRow(rowBottomBubble);
                     return;
                 }
             }
@@ -216,53 +220,68 @@ public class GameGrid : MonoBehaviour {
 
     private Coroutine coroutineMovement = null;
 
-    // 화면에 보이는 버블의 위치를 조절한다.
-    // 총 10 행 출력
-    // 나무는 3행
-    public void UpdateGridPosition()
+    public void ScroolToBottomRow()
     {
-        // 총 버블의 행 수
-        int totalRowCount = LowestBubbleRow + 1;
-
-        Vector3 pos = transform.position;
-
-        int hideRowCount = totalRowCount - GameConst.GRID_VISIBILE_ROW_COUNT;
-        if (hideRowCount < 0)
-            hideRowCount = 0;
-
-        pos.y = GameConst.GRID_MIN_Y_POSITION + (hideRowCount * GameConst.GRID_ROW_HIDE_HEIGHT);
-
-        if (coroutineMovement != null)
-            StopCoroutine(coroutineMovement);
-
-        coroutineMovement = StartCoroutine(GridMovement(pos));
+        ScrollToRow(rowBottomBubble);
     }
-    
-    IEnumerator GridMovement(Vector3 targetPosistion)
+
+    public void ScrollToRow(int targetRow)
     {
-        float sec = 1f;
-        float elapsedTime = 0f;
-
-        Vector3 startPos = transform.position;
-
-        while(elapsedTime < sec)
+        if(coroutineMovement != null)
         {
-            transform.position = Vector3.Lerp(startPos, targetPosistion, elapsedTime / sec);
-            
-            elapsedTime += Time.deltaTime;
+            StopCoroutine(coroutineMovement);
+            coroutineMovement = null;
+        }
+
+        if (totalRowCount - rowBottomBubble < GameConst.NEW_GRID_ROW_VISIBILE_COUNT_ROOF)
+            targetRow = totalRowCount - GameConst.NEW_GRID_ROW_VISIBILE_COUNT_ROOF;
+        
+        coroutineMovement = StartCoroutine(Scrolling(targetRow));
+    }
+
+
+    IEnumerator Scrolling(int row)
+    {
+        float targetPosY = -GameConst.NEW_GRID_ROW_GAP * row;
+
+        float moveDirection = 1f;
+        if (transform.localPosition.y > targetPosY)
+            moveDirection = -1f;
+
+        float remainLength = Mathf.Abs(transform.localPosition.y - targetPosY);
+
+        Vector3 moveVector = new Vector3(0f, 0f, 0f);
+        while (remainLength > 0f)
+        {
+            float distance = Time.deltaTime * scrollSpeed;
+
+            // 이동할 거리가 남은 거리보다 크면 남은 거리 만큼 이동
+            if (distance > remainLength)
+                distance = remainLength;
+
+            moveVector.y = distance * moveDirection;
+
+            transform.localPosition += moveVector;
+
+            remainLength -= distance;
 
             yield return null;
         }
-        transform.position = targetPosistion;
     }
-
-
+    
     // 버블을 목표 셀 주변의 가장 가까운 빈 셀에 추가한다.
     public void AddBubbleToNearCell(Cell targetCell, Bubble bubble)
     {
+        if(targetCell == null)
+        {
+            Debug.LogError("AddBubbleToNearCell - target cell is null!!");
+        }
+
         // 충돌한 셀 주변의 셀을 구한다.
         List<Cell> listAdjacentCells = GetAdjacentCells(targetCell);
 
+        Debug.Log("listAdjacentCells Count : " + listAdjacentCells.Count);
+        
         float minDistance = float.MaxValue;
         Cell nearestCell = null;
 
@@ -270,10 +289,10 @@ public class GameGrid : MonoBehaviour {
         {
             if (cell == null)
                 continue;
-
+            
             if (!cell.IsEmpty())
                 continue;
-
+                
             Vector3 cellPos = cell.GetPositionOnGrid();
 
             float distance = Vector3.Distance(bubble.transform.localPosition, cellPos);
@@ -310,13 +329,12 @@ public class GameGrid : MonoBehaviour {
 
     private Cell GetCell(Vector3 positionOnGrid)
     {
-        int row = (int)((-positionOnGrid.y + (GameConst.GRID_ROW_GAP * 0.5f)) / GameConst.GRID_ROW_GAP);
-
-        float offset = row % 2 == 1 ? GameConst.GRID_EVEN_ROW_X_OFFSET : 0f;
+        int row = (int)((positionOnGrid.y + (GameConst.NEW_GRID_ROW_GAP * 0.5f)) / GameConst.NEW_GRID_ROW_GAP);
+        
+        float offset = CheckOddEvenRow(row) == 0 ? GameConst.GRID_EVEN_ROW_X_OFFSET : 0f;
 
         float posX = positionOnGrid.x - offset;
-
-
+        
         int col = (int)((posX + (GameConst.GRID_COLUMN_GAP * 0.5f)) / GameConst.GRID_COLUMN_GAP);
 
         return grid[row, col];
@@ -336,7 +354,7 @@ public class GameGrid : MonoBehaviour {
         List<Cell> adjacentCellList = new List<Cell>();
 
         // 방문 플래그 초기화
-        Array.Clear(visitedFlags, 0, gridRowCount * GameConst.GRID_COLUMN_COUNT);
+        Array.Clear(visitedFlags, 0, totalRowCount * GameConst.GRID_COLUMN_COUNT);
 
         while (queue.Count > 0)
         {
@@ -392,7 +410,7 @@ public class GameGrid : MonoBehaviour {
 
         foreach (Bubble bubble in listBubbles)
         {
-            bubble.DestroyBubble();
+            bubble.OnDestroyed();
             page.manager.Score += GameConst.SCORE_BUBBLE;
         }
 
@@ -417,15 +435,16 @@ public class GameGrid : MonoBehaviour {
         Queue<Bubble> queue = new Queue<Bubble>();
         
         // 방문 플래그 초기화
-        Array.Clear(visitedFlags, 0, gridRowCount * GameConst.GRID_COLUMN_COUNT);
+        Array.Clear(visitedFlags, 0, totalRowCount * GameConst.GRID_COLUMN_COUNT);
 
+        int topRow = totalRowCount - 1;
         for (int i =0; i < GameConst.GRID_COLUMN_COUNT; ++i)
         {
             // 비여 있는 셀은 건너 뜀.
-            if (grid[0, i].IsEmpty())
+            if (grid[topRow, i].IsEmpty())
                 continue;
 
-            queue.Enqueue(grid[0, i].GetBubble());
+            queue.Enqueue(grid[topRow, i].GetBubble());
         }
 
         while(queue.Count > 0)
@@ -440,7 +459,7 @@ public class GameGrid : MonoBehaviour {
 
             visitedFlags[row, col] = true;
 
-            int rowMod = row % 2;       // 0 == 홀수행 , 1 = 짝수행
+            int rowMod = CheckOddEvenRow(row);       // 0 == 짝수행 , 1 = 홀수행
             
             // 형재와 자식 셀을 검사한다.
             for (int i = 0; i < GameConst.GRID_SIBILING_CHILDREN_CELL_COUNT; ++i)
@@ -448,7 +467,7 @@ public class GameGrid : MonoBehaviour {
                 int adjRow = row + RowOffset[i];
                 int adjCol = col + ColOffset[rowMod, i];
 
-                if (0 <= adjCol && adjCol < GameConst.GRID_COLUMN_COUNT && 0 <= adjRow && adjRow < gridRowCount)
+                if (0 <= adjCol && adjCol < GameConst.GRID_COLUMN_COUNT && 0 <= adjRow && adjRow < totalRowCount)
                 {
                     // 셀이 존재하고, 셀에 버블이 있음.
                     if (grid[adjRow, adjCol] != null && !grid[adjRow, adjCol].IsEmpty())
@@ -479,7 +498,7 @@ public class GameGrid : MonoBehaviour {
         
         foreach(Bubble bubble in listDisconnectedBubbles)
         {  
-            bubble.FallingBubble();
+            bubble.OnDisconnected();
         }
 
         UpdateLowestBubbleRowBottomUp();
@@ -505,63 +524,4 @@ public class GameGrid : MonoBehaviour {
         DestroyBubbles(listBubbles);
     }
 
-}
-
-public class Cell
-{
-    public int row;
-    public int col;
-
-    private Bubble bubble;
-
-    public Cell(int _row, int _col)
-    {
-        row = _row;
-        col = _col;
-
-        bubble = null;
-    }
-
-    public bool IsEmpty()
-    {
-        return bubble == null;
-    }
-
-    public void Clear()
-    {
-        bubble = null;
-    }
-
-    public void AttachBubble(Bubble target)
-    {
-        bubble = target;
-        bubble.cell = this;
-
-        bubble.transform.localPosition = GetPositionOnGrid();
-    }
-
-    public void DetachBubble()
-    {
-        if (this.bubble == null)
-            return;
-
-        bubble.cell = null;
-        bubble = null;
-    }
-
-    public Bubble GetBubble()
-    {
-        return bubble;
-    }
-
-    public Vector3 GetPositionOnGrid()
-    {
-        float x = col * GameConst.GRID_COLUMN_GAP;
-        float y = row * GameConst.GRID_ROW_GAP; 
-
-        if (row % 2 == 1)
-            x += GameConst.GRID_EVEN_ROW_X_OFFSET;
-
-        return new Vector3(x, -y, 0f);
-    }
 }

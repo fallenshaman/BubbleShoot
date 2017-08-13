@@ -77,7 +77,7 @@ public partial class GameManager  {
     private Bubble CreateProjectileBubble()
     {
         Bubble bubble = bubblePool.Spawn().GetComponent<Bubble>();
-        bubble.SetBubble();
+        bubble.SetNormalBubble();
         bubble.SetRandomColor();
 
         return bubble;
@@ -136,7 +136,11 @@ public partial class GameManager  {
             return;
 
         projectile.transform.position = launchPivot.position;
-        projectile.SetProjectilBubble();
+        if (ActivateFireball)
+            projectile.SetFireBall();
+        else
+            projectile.SetProjectilBubble();
+
         projectile.AddForce(launchPivot.up.normalized * settings.BubbleSpeed);
 
         projectile = null;

@@ -62,7 +62,7 @@ public partial class GameManager : PageManager
 
     public override void OnPageShow()
     {
-        gameGrid.UpdateGridPosition();
+        gameGrid.ScroolToBottomRow();
     }
 
     public override void OnPageUnload()
@@ -82,7 +82,7 @@ public partial class GameManager : PageManager
 
         gameGrid.OnBubbleAttached += OnBubbleAttached;
         
-        gameGrid.CreateGrid(levelData);
+        gameGrid.CreateGridFromLevel(levelData);
         
         IsMissionEnd = false;
 

@@ -18,6 +18,9 @@ public partial class GameManager  {
         set
         {
             missionValue = value;
+            if (missionValue > levelData.goal)
+                missionValue = levelData.goal;
+
             SetMissonValue(missionValue);
         }
     }

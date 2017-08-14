@@ -39,6 +39,7 @@ GameObject:
   - component: {fileID: 212498703059689318}
   - component: {fileID: 50637057046543024}
   - component: {fileID: 58593637708889974}
+  - component: {fileID: 95343979633151960}
   m_Layer: 8
   m_Name: Bubble
   m_TagString: Bubble
@@ -108,6 +109,23 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!95 &95343979633151960
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1849935024705620}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 172bee680de0a8046863a4d90e60b382, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114979751070139880
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -119,9 +137,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c5643195b7c39b4385081d2be1b392e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidbody: {fileID: 50637057046543024}
+  rigid2D: {fileID: 50637057046543024}
   spriteRenderer: {fileID: 212498703059689318}
   subImage: {fileID: 212318149505216026}
+  animator: {fileID: 95343979633151960}
+  trapType: 0
 --- !u!212 &212318149505216026
 SpriteRenderer:
   m_ObjectHideFlags: 1

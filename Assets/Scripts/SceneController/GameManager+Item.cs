@@ -185,9 +185,6 @@ public partial class GameManager {
         // 파이어볼 활성화
         ActivateFireball = true;
 
-        // 발사 준비중인 버블을 파이어볼로 변경
-        projectile.SetFireBall();
-
         fireball.parent = projectile.transform;
         fireball.localPosition = new Vector3(0f, 0f, -1f);
         fireball.gameObject.SetActive(true);

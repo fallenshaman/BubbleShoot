@@ -6,18 +6,20 @@ public partial class Bubble
 {
     private FSM<Bubble.Type> fsm;
 
+    public Bubble.Type GetState()
+    {
+        return fsm.CurrentStateType();
+    }
+
+
     private void InitializeStates()
     {
         fsm = new FSM<Type>();
 
-        fsm.AddState(new State<Type>(Type.NORMAL, OnEnterNormal));
-        fsm.AddState(new State<Type>(Type.TRAP, OnEnterTrap, OnExitTrap));
+        fsm.AddState(new State<Type>(Type.NORMAL, OnEnterNormal, OnExitNormal));
         fsm.AddState(new State<Type>(Type.PROJECTILE, OnEnterProjectile, OnExitProjectile));
-        fsm.AddState(new State<Type>(Type.FALLING, OnEnterFalling, OnExitFalling));
         fsm.AddState(new State<Type>(Type.BEE, OnEnterBee, OnExitBee));
         fsm.AddState(new State<Type>(Type.HIVE, OnEnterHive, OnExitHive));
-        fsm.AddState(new State<Type>(Type.FIRE_BALL, OnEnterFireBall, OnExitFireBall));
-        
     }
     
     public void SetState(Bubble.Type type)
@@ -29,98 +31,59 @@ public partial class Bubble
     public void SetNormalBubble()
     {
         fsm.ChangeState(Type.NORMAL);
+        SetTrap(Trap.NONE);
     }
 
-    public void SetNormalBubble(Bubble.Color color)
+    public void SetNormalBubble(Bubble.Color color, Bubble.Trap _trap = Trap.NONE)
     {
         fsm.ChangeState(Type.NORMAL);
         SetColor(color);
+        SetTrap(_trap);
     }
 
     private void OnEnterNormal()
     {
-        type = Type.NORMAL;
+        //type = Type.NORMAL;
 
         gameObject.tag = GameConst.TAG_BUBBLE;
         gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_BUBBLE);
-
-        trapType = Trap.NONE;
-    }
-    #endregion
-
-    #region TRAP
-    public void SetTrapBubble(Bubble.Color color, Bubble.Trap trap)
-    {
-        fsm.ChangeState(Type.TRAP);
         
-        SetColor(color);
-
-        trapType = trap;
-        SetSubImage(App.Instance.setting.trapIcons[(int)trapType]);
+        // 일반 버블의 행동 정의
+        behaviour = new NormalBehaviour(this);
     }
 
-    private void OnEnterTrap()
+    private void OnExitNormal()
     {
-        type = Type.TRAP;
-
-        gameObject.tag = GameConst.TAG_BUBBLE;
-        gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_BUBBLE);
+        SetTrap(Trap.NONE);
     }
-
-    private void OnExitTrap()
-    {
-        trapType = Trap.NONE;
-        SetSubImage();
-    }
-
+    
     #endregion
-
 
     #region PROJECTILE
     public void SetProjectilBubble()
     {
         fsm.ChangeState(Type.PROJECTILE);
+        SetRandomColor();
     }
-    
+
     private void OnEnterProjectile()
     {
-        type = Type.PROJECTILE;
-        
-        gameObject.tag = GameConst.TAG_PROJECTILE;
-        gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_PROJECTILE);
+        //type = Type.PROJECTILE;
 
-        rigidbody.bodyType = RigidbodyType2D.Dynamic;
+        gameObject.tag = GameConst.TAG_PROJECTILE;
+        gameObject.layer = 0;       // Default;
+
+        rigid2D.bodyType = RigidbodyType2D.Dynamic;
+        
+        behaviour = new ProjectileBehaviour(this);
     }
 
     private void OnExitProjectile()
     {
-        rigidbody.velocity = Vector2.zero;
-        rigidbody.angularVelocity = 0f;
+        rigid2D.velocity = Vector2.zero;
+        rigid2D.angularVelocity = 0f;
 
-        rigidbody.bodyType = RigidbodyType2D.Static;
-    }
-    #endregion
-
-    #region FALLING
-    public void SetFallingBubble()
-    {
-        fsm.ChangeState(Type.FALLING);
-    }
-
-    private void OnEnterFalling()
-    {
-        type = Type.FALLING;
-
-        gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_FALLING_BUBBLE);
-
-        rigidbody.bodyType = RigidbodyType2D.Dynamic;
-        rigidbody.gravityScale = 5f;
-    }
-
-    private void OnExitFalling()
-    {
-        rigidbody.gravityScale = 0f;
-        rigidbody.bodyType = RigidbodyType2D.Static;
+        rigid2D.bodyType = RigidbodyType2D.Static;
     }
     #endregion
 
@@ -129,12 +92,14 @@ public partial class Bubble
     {
         fsm.ChangeState(Type.BEE);
     }
-    
+
     private void OnEnterBee()
     {
-        type = Type.BEE;
+        //type = Type.BEE;
         SetColor(Color.PURPLE);
         SetSubImage(App.Instance.setting.bee);
+
+        behaviour = new BeeBehaviour(this);
     }
 
     private void OnExitBee()
@@ -145,49 +110,107 @@ public partial class Bubble
     #endregion
 
     #region HIVE
-   public void SetHiveBubble()
+    public void SetHiveBubble(Color color)
     {
         fsm.ChangeState(Type.HIVE);
+
+        SetColor(color);
+        SetSubImage(App.Instance.setting.hive);
     }
 
     private void OnEnterHive()
     {
-        type = Type.HIVE;
+        //type = Type.HIVE;
+        behaviour = new HiveBehaviour(this);
     }
 
     private void OnExitHive()
     {
-
+        SetSubImage();
     }
-
-
     #endregion
 
-    #region FIRE_BALL
-    
-    public void SetFireBall()
-    {
-        fsm.ChangeState(Type.FIRE_BALL);
-    }
 
-    private void OnEnterFireBall()
-    {
-        type = Type.FIRE_BALL;
+    //#region TRAP
+    //public void SetTrapBubble(Bubble.Color color, Bubble.Trap trap)
+    //{
+    //    fsm.ChangeState(Type.TRAP);
 
-        gameObject.tag = GameConst.TAG_FIRE_BALL;
-        gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_PROJECTILE);
+    //    SetColor(color);
 
-        rigidbody.bodyType = RigidbodyType2D.Dynamic;
-    }
-    
-    private void OnExitFireBall()
-    {
-        rigidbody.velocity = Vector2.zero;
-        rigidbody.angularVelocity = 0f;
+    //    trapType = trap;
+    //    SetSubImage(App.Instance.setting.trapIcons[(int)trapType]);
+    //}
 
-        rigidbody.bodyType = RigidbodyType2D.Static;
-    }
+    //private void OnEnterTrap()
+    //{
+    //    type = Type.TRAP;
 
-    #endregion
+    //    gameObject.tag = GameConst.TAG_BUBBLE;
+    //    gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_BUBBLE);
+    //}
+
+    //private void OnExitTrap()
+    //{
+    //    trapType = Trap.NONE;
+    //    SetSubImage();
+    //}
+
+    //#endregion
+
+
+
+
+    //#region FALLING
+    //public void SetFallingBubble()
+    //{
+    //    fsm.ChangeState(Type.FALLING);
+    //}
+
+    //private void OnEnterFalling()
+    //{
+    //    type = Type.FALLING;
+
+    //    gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_FALLING_BUBBLE);
+
+    //    rigid2D.bodyType = RigidbodyType2D.Dynamic;
+    //    rigid2D.gravityScale = 5f;
+    //}
+
+    //private void OnExitFalling()
+    //{
+    //    rigid2D.gravityScale = 0f;
+    //    rigid2D.bodyType = RigidbodyType2D.Static;
+    //}
+    //#endregion
+
+
+
+    //#region FIRE_BALL
+
+    //public void SetFireBall()
+    //{
+    //    fsm.ChangeState(Type.FIRE_BALL);
+    //}
+
+    //private void OnEnterFireBall()
+    //{
+    //    type = Type.FIRE_BALL;
+
+    //    gameObject.tag = GameConst.TAG_FIRE_BALL;
+    //    gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_PROJECTILE);
+
+    //    rigid2D.bodyType = RigidbodyType2D.Dynamic;
+    //}
+
+    //private void OnExitFireBall()
+    //{
+    //    rigid2D.velocity = Vector2.zero;
+    //    rigid2D.angularVelocity = 0f;
+
+    //    rigid2D.bodyType = RigidbodyType2D.Static;
+    //}
+
+    //#endregion
 
 }

@@ -77,9 +77,8 @@ public partial class GameManager  {
     private Bubble CreateProjectileBubble()
     {
         Bubble bubble = bubblePool.Spawn().GetComponent<Bubble>();
-        bubble.SetNormalBubble();
-        bubble.SetRandomColor();
-
+        bubble.SetProjectilBubble();
+        
         return bubble;
     }
 
@@ -90,10 +89,30 @@ public partial class GameManager  {
     }
 
     //그리드에 버블이 부착 되었을때 호출
-    private void OnBubbleAttached()
+    private void OnBubbleAttached(Bubble bubble)
     {
-        OnLaunchComplete();
+        //OnLaunchComplete();
+
+        //// 버블이 존재하는 가장 낮은 행의 값을 갱신
+        //gameGrid.UpdateLowestBubbleRow(bubble);
+        //gameGrid.DestroySameColorBubbles(bubble);
+        StartCoroutine(bubbleAttached(bubble));
     }
+
+    IEnumerator bubbleAttached(Bubble bubble)
+    {
+        bubble.PlayBouncingAnim();
+
+        yield return new WaitForSeconds(GameConst.BUBBLE_ATTACH_WAITING);
+
+        OnLaunchComplete();
+
+        // 버블이 존재하는 가장 낮은 행의 값을 갱신
+        gameGrid.UpdateLowestBubbleRow(bubble);
+        gameGrid.DestroySameColorBubbles(bubble);
+    }
+
+
 
 
     // 발사체가 부착, 또는 화면 밖으로 나가 파괴되고 호출
@@ -136,10 +155,7 @@ public partial class GameManager  {
             return;
 
         projectile.transform.position = launchPivot.position;
-        if (ActivateFireball)
-            projectile.SetFireBall();
-        else
-            projectile.SetProjectilBubble();
+        projectile.gameObject.layer = LayerMask.NameToLayer(GameConst.LAYER_PROJECTILE);
 
         projectile.AddForce(launchPivot.up.normalized * settings.BubbleSpeed);
 

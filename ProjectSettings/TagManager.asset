@@ -11,6 +11,7 @@ TagManager:
   - Projectile
   - FireBall
   - Fly
+  - Pot
   layers:
   - Default
   - TransparentFX

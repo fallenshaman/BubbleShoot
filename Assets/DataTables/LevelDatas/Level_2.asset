@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: Level_2
   m_EditorClassIdentifier: 
   levelType: 2
-  goal: 60
+  goal: 90
   bubbleCount: 40
   listRows:
   - cells:

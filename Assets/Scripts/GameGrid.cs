@@ -24,7 +24,7 @@ public class GameGrid : MonoBehaviour {
     // 버블이 부착되어 있는 가장 낮은 행의 번호
     public int rowBottomBubble { get; private set; }
 
-    public Action OnBubbleAttached = () => { };
+    public Action<Bubble> OnBubbleAttached = (Bubble) => { };
 
     public float scrollSpeed;
 
@@ -112,10 +112,7 @@ public class GameGrid : MonoBehaviour {
 
                     if (info.type == CellInfo.CellType.NORMAL)
                     {
-                        if (info.trap == Bubble.Trap.NONE)
-                            bubble.SetNormalBubble(info.color);
-                        else
-                            bubble.SetTrapBubble(info.color, info.trap);
+                        bubble.SetNormalBubble(info.color, info.trap);
                     }
                     else if (info.type == CellInfo.CellType.BEE)
                     {
@@ -123,10 +120,7 @@ public class GameGrid : MonoBehaviour {
                     }
                     else if (info.type == CellInfo.CellType.HIVE)
                     {
-                        bubble.SetState(Bubble.Type.HIVE);
-                        bubble.type = Bubble.Type.HIVE;
-                        bubble.SetColor(info.color);
-                        bubble.SetSubImage(App.Instance.setting.hive);
+                        bubble.SetHiveBubble(info.color);
                     }
 
                     bubble.transform.parent = this.transform;
@@ -204,10 +198,7 @@ public class GameGrid : MonoBehaviour {
 
                 if (info.type == CellInfo.CellType.NORMAL)
                 {
-                    if (info.trap == Bubble.Trap.NONE)
-                        bubble.SetNormalBubble(info.color);
-                    else
-                        bubble.SetTrapBubble(info.color, info.trap);
+                    bubble.SetNormalBubble(info.color, info.trap);
                 }
                 else if (info.type == CellInfo.CellType.BEE)
                 {
@@ -215,10 +206,7 @@ public class GameGrid : MonoBehaviour {
                 }
                 else if (info.type == CellInfo.CellType.HIVE)
                 {
-                    bubble.SetState(Bubble.Type.HIVE);
-                    bubble.type = Bubble.Type.HIVE;
-                    bubble.SetColor(info.color);
-                    bubble.SetSubImage(App.Instance.setting.hive);
+                    bubble.SetHiveBubble(info.color);
                 }
 
                 bubble.transform.parent = this.transform;
@@ -379,7 +367,7 @@ public class GameGrid : MonoBehaviour {
             
             if (!cell.IsEmpty())
                 continue;
-                
+            
             Vector3 cellPos = cell.GetPositionOnGrid();
 
             float distance = Vector3.Distance(bubble.transform.localPosition, cellPos);
@@ -390,10 +378,10 @@ public class GameGrid : MonoBehaviour {
                 nearestCell = cell;
             }
         }
-
+        
         nearestCell.AttachBubble(bubble);
 
-        OnBubbleAttached();
+        OnBubbleAttached(bubble);
     }
 
     // 그리드 상의 좌표에서 가장 가까운 빈 셀에 버블을 추가한다.
@@ -406,7 +394,7 @@ public class GameGrid : MonoBehaviour {
         if(cell.IsEmpty())
         {
             cell.AttachBubble(bubble);
-            OnBubbleAttached();
+            OnBubbleAttached(bubble);
         }
         else
         {
@@ -499,12 +487,9 @@ public class GameGrid : MonoBehaviour {
     // 리스트로 전달받은 버블들을 파괴한다.
     private void DestroyBubbles(List<Bubble> listBubbles)
     {
-        GamePage page = (GamePage)App.Instance.CurrentPage;
-
         foreach (Bubble bubble in listBubbles)
         {
             bubble.OnDestroyed();
-            page.manager.Score += GameConst.SCORE_BUBBLE;
         }
 
         // 가장 낮은 행부터 위로 검사하여 버블이 존재하는 낮은 행의 값 갱신

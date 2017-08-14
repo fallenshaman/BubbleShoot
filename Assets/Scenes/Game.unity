@@ -418,7 +418,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1498336468960660, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
       propertyPath: m_TagString
-      value: Untagged
+      value: Pot
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
@@ -444,7 +444,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699921f637b452547894f6110663bbc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 1660622591}
   score: 250
 --- !u!4 &68478761 stripped
 Transform:
@@ -1162,7 +1161,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1498336468960660, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
       propertyPath: m_TagString
-      value: Untagged
+      value: Pot
       objectReference: {fileID: 0}
     - target: {fileID: 1498336468960660, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
       propertyPath: m_IsActive
@@ -1192,7 +1191,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699921f637b452547894f6110663bbc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 1660622591}
   score: 250
 --- !u!4 &247045146 stripped
 Transform:
@@ -1713,7 +1711,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1498336468960660, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
       propertyPath: m_TagString
-      value: Untagged
+      value: Pot
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
@@ -1739,7 +1737,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699921f637b452547894f6110663bbc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 1660622591}
   score: 1000
 --- !u!4 &418427931 stripped
 Transform:
@@ -2200,7 +2197,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1498336468960660, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
       propertyPath: m_TagString
-      value: Untagged
+      value: Pot
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
@@ -2226,7 +2223,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699921f637b452547894f6110663bbc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 1660622591}
   score: 500
 --- !u!4 &520848224 stripped
 Transform:
@@ -4767,7 +4763,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1498336468960660, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
       propertyPath: m_TagString
-      value: Untagged
+      value: Pot
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6ce84f22fef74e9409fcf7527dd27ce1, type: 2}
@@ -4793,7 +4789,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699921f637b452547894f6110663bbc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 1660622591}
   score: 500
 --- !u!4 &1460770176 stripped
 Transform:

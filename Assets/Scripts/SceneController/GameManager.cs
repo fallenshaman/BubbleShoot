@@ -80,7 +80,7 @@ public partial class GameManager : PageManager
         bubblePool = PoolManager.Instance.GetPool(GameConst.POOL_BUBBLE);
         flyPool = PoolManager.Instance.GetPool(GameConst.POOL_FLY);
 
-        gameGrid.OnBubbleAttached += OnBubbleAttached;
+        gameGrid.OnBubbleAttached = OnBubbleAttached;
         
         gameGrid.CreateGridFromLevel(levelData);
         
@@ -174,7 +174,7 @@ public partial class GameManager : PageManager
             if(bubble != null)
             {
                 // 그리드에 부착된 버블을 터치함
-                if(bubble.IsAttached() && bubble.type == Bubble.Type.NORMAL)
+                if(bubble.IsAttached() && bubble.GetState() == Bubble.Type.NORMAL)
                 {
                     gameGrid.Hammering(bubble);
                     ActivateHammer = false;

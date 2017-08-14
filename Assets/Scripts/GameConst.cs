@@ -24,6 +24,7 @@ public class GameConst
     public static string TAG_WALL = "Wall";
     public static string TAG_GUIDE_WALL = "Bubble";
     public static string TAG_FLY = "Fly";
+    public static string TAG_POT = "Pot";
     
     public static string TAG_DESTROY_AREA = "DestroyArea";
     public static string TAG_PROJECTILE = "Projectile";
@@ -73,10 +74,15 @@ public class GameConst
     public static int GRID_VISIBILE_ROW_COUNT = 7;
     public static float GRID_ROW_HIDE_HEIGHT = 1.15f;
     public static float GRID_MIN_Y_POSITION = 16.5f;
+    
     #endregion
+
+    public static string BUBBLE_BOUNCING_ANIM_TRIGGER = "Bouncing";
+    public static float BUBBLE_ATTACH_WAITING = 0.2f;
 
     public static int BUBBLE_COLOR_RANGE = 4;
     public static float BUBBLE_COLOR_CHANGE_TIME = 0.2f;
+    public static float BUBBLE_FALLING_GRAVITY = 5f;
 
 #region TRAP
     public static int TRAP_BETTLE_LIFE = 5;
